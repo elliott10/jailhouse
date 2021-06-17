@@ -33,12 +33,12 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 	# jailhouse cell load 1 uart-demo.bin;
 	# jailhouse cell start 1;
 
-![](https://gitee.com/phytium_embedded/ft2004-jailhouse/pic/uart.png)
+![](https://gitee.com/phytium_embedded/ft2004-jailhouse/raw/master/pic/uart.png)
 
 ## 3.2 RTOS
 RTOS的运行需要根据系统特性来适配，目前已经可以运行VxWorks（配置串口和网卡），运行效果如下图所示：
 
-![](https://gitee.com/phytium_embedded/ft2004-jailhouse/pic/vxworks.png)
+![](https://gitee.com/phytium_embedded/ft2004-jailhouse/raw/master/pic/vxworks.png)
 
 
 ## 3.3 Linux
@@ -49,7 +49,7 @@ RTOS的运行需要根据系统特性来适配，目前已经可以运行VxWorks
 	# jailhouse enable phytium.cell
 	# jailhouse cell linux -i initrd.ext2 -d ft2004.dtb phytium-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 root=/dev/ram0  ramdisk_size=0x1000000"
 
-![](https://gitee.com/phytium_embedded/ft2004-jailhouse/pic/linux.png)
+![](https://gitee.com/phytium_embedded/ft2004-jailhouse/raw/master/pic/linux.png)
 
 
 # 4 其他
