@@ -48,10 +48,50 @@ RTOS的运行需要根据系统特性来适配，目前已经可以运行VxWorks
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/linux.png)
 
+# 4 Non-root linux实时性测试
 
-# 4 其他
+测试使用了stress和while循环脚本（均运行四个进程）来增加系统负载，命令如下：
 
-如有需要，联系飞腾嵌入式软件部,联系邮箱：
+	$ stress -c 4
+
+	$ while true;  do
+	  ifconfig lo up;
+	done &
+
+通过cyclictest观察内核实时性，命令如下，主要查看各个测量进程的最大，最小和平均延时，单位为微秒：
+
+	$ cyclictest -p 80 -t 5 -n
+
+Jailhouse non-root Linux普通内核测试结果:
+
+	T: 0 ( 6342) P:80 I:1000 C: 328710 Min:      4 Act:    5 Avg:    5 Max:    5822
+	T: 1 ( 6343) P:80 I:1500 C: 219140 Min:      3 Act:    4 Avg:    5 Max:    5712
+	T: 2 ( 6344) P:80 I:2000 C: 164355 Min:      4 Act:    9 Avg:    6 Max:    4840
+	T: 3 ( 6345) P:80 I:2500 C: 131484 Min:      3 Act:    4 Avg:    6 Max:    4059
+	T: 4 ( 6346) P:80 I:3000 C: 109570 Min:      4 Act:    5 Avg:    6 Max:      22
+
+Jailhouse non-root Linux实时内核测试结果:
+
+	T: 0 ( 4094) P:80 I:1000 C:1597867 Min:      4 Act:    5 Avg:    6 Max:      29
+	T: 1 ( 4095) P:80 I:1500 C:1065250 Min:      4 Act:   10 Avg:    7 Max:      44
+	T: 2 ( 4096) P:80 I:2000 C: 798937 Min:      4 Act:    5 Avg:    5 Max:      40
+	T: 3 ( 4097) P:80 I:2500 C: 639150 Min:      4 Act:   10 Avg:    7 Max:      24
+	T: 4 ( 4098) P:80 I:3000 C: 532625 Min:      4 Act:    7 Avg:    6 Max:      22
+
+KVM实时内核测试结果：
+
+	T: 0 ( 3425) P:80 I:1000 C: 815342 Min:      3 Act:   16 Avg:   14 Max:    7383
+	T: 1 ( 3426) P:80 I:1500 C: 543579 Min:      6 Act:   11 Avg:   14 Max:   19236
+	T: 2 ( 3427) P:80 I:2000 C: 407689 Min:      5 Act:   20 Avg:   14 Max:   18739
+	T: 3 ( 3428) P:80 I:2500 C: 326166 Min:      6 Act:   10 Avg:   11 Max:    8051
+	T: 4 ( 3429) P:80 I:3000 C: 271803 Min:      6 Act:    9 Avg:   11 Max:   17478
+
+根据上面的测试结果可知：相比KVM虚拟化，Jailhouse虚拟化的实时性更好。
+
+
+# 5 其他
+
+如有需要，可联系飞腾嵌入式软件部,联系邮箱：
 
 	lizongjun@phytium.com.cn
 	shixiaofeng@phytium.com.cn
