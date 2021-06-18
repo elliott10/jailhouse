@@ -178,6 +178,7 @@ static void send_irq(struct ivshmem_dev_data *d)
 	u32 int_no = d->msix_cap > 0 ? (d->id + 1) : 0;
 
 	disable_irqs();
+	target = 0;
 	printk("\nIVSHMEM: sending IRQ %d to peer %d\n", int_no, target);
 	enable_irqs();
 	mmio_write32(&d->registers->doorbell, int_no | (target << 16));

@@ -1,16 +1,8 @@
 /*
  * Jailhouse, a Linux-based partitioning hypervisor
  *
- * Configuration for demo inmate on LeMaker HiKey board, 2GiB:
- * 1 CPU, 64K RAM, 1 serial port
+ * Configuration for demo inmate on Phytium FT2000/4
  *
- * Copyright (c) Siemens AG, 2016
- *
- * Authors:
- *  Jan Kiszka <jan.kiszka@siemens.com>
- *
- * This work is licensed under the terms of the GNU GPL, version 2.  See
- * the COPYING file in the top-level directory.
  */
 
 #include <jailhouse/types.h>
@@ -26,7 +18,7 @@ struct {
 	.cell = {
 		.signature = JAILHOUSE_CELL_DESC_SIGNATURE,
 		.revision = JAILHOUSE_CONFIG_REVISION,
-		.name = "phytium-inmate-demo",
+		.name = "ft2004-inmate-demo",
 		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG,
 
 		.cpu_set_size = sizeof(config.cpus),

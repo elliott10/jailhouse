@@ -1,15 +1,8 @@
 /*
  * Jailhouse, a Linux-based partitioning hypervisor
  *
- * Configuration for LeMaker HiKey board, 2 GB
+ * Configuration for Phytium FT2000/4
  *
- * Copyright (c) Siemens AG, 2016
- *
- * Authors:
- *  Jan Kiszka <jan.kiszka@siemens.com>
- *
- * This work is licensed under the terms of the GNU GPL, version 2.  See
- * the COPYING file in the top-level directory.
  */
 
 #include <jailhouse/types.h>
@@ -20,7 +13,7 @@ struct {
 	__u64 cpus[1];
 	struct jailhouse_memory mem_regions[27];
 	struct jailhouse_irqchip irqchips[1];
-	struct jailhouse_pci_device pci_devices[2];
+	struct jailhouse_pci_device pci_devices[1];
 } __attribute__((packed)) config = {
 	.header = {
 		.signature = JAILHOUSE_SYSTEM_SIGNATURE,
@@ -54,7 +47,7 @@ struct {
 			},
 		},
 		.root_cell = {
-			.name = "Phytium2004",
+			.name = "ft2004",
 
 			.cpu_set_size = sizeof(config.cpus),
 			.num_memory_regions = ARRAY_SIZE(config.mem_regions),
@@ -300,11 +293,6 @@ struct {
 			.shmem_dev_id = 0,
 			.shmem_peers = 3,
 			.shmem_protocol = JAILHOUSE_SHMEM_PROTO_UNDEFINED,
-		},
-		{
-			.type = JAILHOUSE_PCI_TYPE_DEVICE,
-			.domain = 0,
-			.bdf = 6 << 8,
 		},
 	},
 };

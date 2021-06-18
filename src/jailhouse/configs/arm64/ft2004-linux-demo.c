@@ -1,16 +1,7 @@
 /*
  * Jailhouse, a Linux-based partitioning hypervisor
  *
- * Configuration for linux-demo inmate on HiKey:
- * 1 CPU, 128M RAM, serial port 3
- *
- * Copyright (c) Siemens AG, 2014-2016
- *
- * Authors:
- *  Jan Kiszka <jan.kiszka@siemens.com>
- *
- * This work is licensed under the terms of the GNU GPL, version 2.  See
- * the COPYING file in the top-level directory.
+ * Configuration for linux-demo inmate on Phytium FT2000/4
  */
 
 #include <jailhouse/types.h>
@@ -19,16 +10,15 @@
 struct {
 	struct jailhouse_cell_desc cell;
 	__u64 cpus[1];
-	struct jailhouse_memory mem_regions[17];
+	struct jailhouse_memory mem_regions[13];
 	struct jailhouse_irqchip irqchips[1];
-	struct jailhouse_pci_device pci_devices[2];
+	struct jailhouse_pci_device pci_devices[1];
 } __attribute__((packed)) config = {
 	.cell = {
 		.signature = JAILHOUSE_CELL_DESC_SIGNATURE,
 		.revision = JAILHOUSE_CONFIG_REVISION,
-		.name = "phytium-linux-demo",
+		.name = "ft2004-linux-demo",
 		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG,
-			//|JAILHOUSE_CELL_VIRTUAL_CONSOLE_PERMITTED,
 
 		.cpu_set_size = sizeof(config.cpus),
 		.num_memory_regions = ARRAY_SIZE(config.mem_regions),
@@ -111,38 +101,6 @@ struct {
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
 				JAILHOUSE_MEM_COMM_REGION,
 		},
-		/* PCIe ECAM */
-		{
-			.phys_start = 0x40000000,
-			.virt_start = 0x40000000,
-			.size = 0x10000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		/* PCIe IO */
-		{
-			.phys_start = 0x50000000,
-			.virt_start = 0x50000000,
-			.size = 0x8000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		/* PCIe Mem32 */
-		{
-			.phys_start = 0x58000000,
-			.virt_start = 0x58000000,
-			.size = 0x28000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		/* PCIe Mem64 */
-		{
-			.phys_start = 0x1000000000,
-			.virt_start = 0x1000000000,
-			.size = 0x1000000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
-		},
 	},
 
 	.irqchips = {
@@ -168,11 +126,6 @@ struct {
 			.shmem_dev_id = 2,
 			.shmem_peers = 3,
 			.shmem_protocol = JAILHOUSE_SHMEM_PROTO_UNDEFINED,
-		},
-		{
-			.type = JAILHOUSE_PCI_TYPE_DEVICE,
-			.domain = 0,
-			.bdf = 6 << 8,
 		},
 	},
 
