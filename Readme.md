@@ -6,7 +6,8 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 
 # 2 编译
-配置好如下aarch64交叉编译环境：
+
+在x86环境下编译Jailhouse,需配置好如下aarch64交叉编译环境：
 
 	$ export PATH=/opt/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
 	$ export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
@@ -20,9 +21,12 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 
 # 3 运行
+
+目前在飞腾FT2000/4上可运行如下示例，测试内核版本为4.19，根文件系统为Ubuntu 18.04。如有需要，可联系飞腾嵌入式软件部获取。
+
 ## 3.1 裸机程序
 
-首先加载jailhouse驱动模块，之后再加载root cell和non-root cell，在FT2000/4板卡上，ft2004.cell为root cell，主要接管整个系统，ft2004-inmate-demo.cell为non-root cell，从root cell中获取一部分系统资源（共享或者独占），给后续加载的裸机程序；之后加载并运行的裸机程序，命令序列和运行效果如下图所示。
+首先加载jailhouse驱动模块，再加载root cell和non-root cell，在FT2000/4板卡上，ft2004.cell为root cell，主要接管整个系统，ft2004-inmate-demo.cell为non-root cell，从root cell中获取一部分系统资源（共享或者独占），分配给后续加载的裸机程序；最后加载并运行的裸机程序，命令序列和运行效果如下图所示。
 
 	# modprobe jailhouse;
 	# jailhouse enable ft2004.cell;
