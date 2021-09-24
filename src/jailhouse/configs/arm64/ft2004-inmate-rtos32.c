@@ -16,7 +16,7 @@ struct {
 	.cell = {
 		.signature = JAILHOUSE_CELL_DESC_SIGNATURE,
 		.revision = JAILHOUSE_CONFIG_REVISION,
-		.name = "ft2004-inmate-vxworks",
+		.name = "ft2004-inmate-rtos32",
 		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG | JAILHOUSE_CELL_AARCH32,
 
 		.cpu_set_size = sizeof(config.cpus),
@@ -33,7 +33,7 @@ struct {
 	},
 
 	.cpus = {
-		0x2,
+		0x1,
 	},
 
 	.irqchips = {
