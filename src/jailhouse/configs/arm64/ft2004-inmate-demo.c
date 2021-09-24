@@ -30,6 +30,7 @@ struct {
 				
 		.console = {
 			.address = 0x28000000,
+			.divider = 0x1a,
 			.type = JAILHOUSE_CON_TYPE_PL011,
 			.flags = JAILHOUSE_CON_ACCESS_MMIO |
 				 JAILHOUSE_CON_REGDIST_4,
