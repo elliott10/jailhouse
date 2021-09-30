@@ -37,10 +37,25 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/uart.png)
 
 ## 3.2 RTOS
-RTOS的运行需要根据系统特性来适配，目前已经可以运行VxWorks（配置串口和网卡），运行效果如下图所示：
+RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTOS和VxWorks，运行32位和64位的系统需要使用不同的inmate文件，32位VxWorks运行序列和效果如下图所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable ft2004.cell;
+	# jailhouse cell create ft2004-inmate-rtos32.cell;
+	# jailhouse cell load 1 vxWorks32.bin --address 0x80100000;
+	# jailhouse cell start 1;
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/vxworks.png)
 
+64位FreeRTOS运行序列和效果如下所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable ft2004.cell;
+	# jailhouse cell create ft2004-inmate-rtos64.cell;
+	# jailhouse cell load 1 freertos64.bin --address 0x80100000;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/freertos64.png)
 
 ## 3.3 Linux
 
