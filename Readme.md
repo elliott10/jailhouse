@@ -26,7 +26,7 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 # 3 运行
 
-目前在飞腾FT2000/4上可运行如下示例，测试内核版本为4.19，根文件系统为Ubuntu 18.04。如有需要，可联系飞腾嵌入式软件部获取。
+目前在飞腾FT2000/4和D2000上运行如下示例，测试内核版本为4.19，根文件系统为Ubuntu 18.04。如有需要，可联系飞腾嵌入式软件部获取。
 
 ## 3.1 设备树保留内存节点
 
@@ -44,6 +44,7 @@ Jailhouse需要保留部分内存空间，在设备树中添加如下节点，�
 
 ## 3.2 裸机程序
 
+### 3.2.1 ft2000测试
 首先加载jailhouse驱动模块，再加载root cell和non-root cell，在FT2000/4板卡上，ft2004.cell为root cell，主要接管整个系统，ft2004-inmate-demo.cell为non-root cell，从root cell中获取一部分系统资源（共享或者独占），分配给后续加载的裸机程序；最后加载并运行的裸机程序，命令序列和运行效果如下图所示。
 
 	# modprobe jailhouse;
@@ -54,7 +55,20 @@ Jailhouse需要保留部分内存空间，在设备树中添加如下节点，�
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/uart.png)
 
+### 3.2.2 d2000测试
+D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的裸机程序，命令序列和运行效果如下图所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable d2000.cell;
+	# jailhouse cell create d2000-inmate-demo.cell;
+	# jailhouse cell load 1 uart-demo.bin;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_uart.png)
+
 ## 3.3 RTOS
+
+### 3.3.1 ft2000测试
 RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTOS和VxWorks，运行32位和64位的系统需要使用不同的inmate文件，32位VxWorks运行序列和效果如下图所示：
 
 	# modprobe jailhouse;
@@ -74,6 +88,40 @@ RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTO
 	# jailhouse cell start 1;
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/freertos64.png)
+
+### 3.3.2 d2000测试
+D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位。
+
+32位VxWorks运行序列和效果如下所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable d2000.cell;
+	# jailhouse cell create d2000-inmate-rtos32.cell;
+	# jailhouse cell load 1 vxWorks32.bin --address 0x80100000;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_vxworks32.png)
+
+64位VxWorks运行序列和效果如下所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable d2000.cell;
+	# jailhouse cell create d2000-inmate-rtos64.cell;
+	# jailhouse cell load 1 vxWorks64.bin --address 0x80100000;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_vxworks64.png)
+
+
+64位FreeRTOS运行序列和效果如下所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable d2000.cell;
+	# jailhouse cell create d2000-inmate-rtos64.cell;
+	# jailhouse cell load 1 freertos64.bin --address 0x80100000;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_FreeRTOS64.png)
 
 ## 3.4 Linux
 
