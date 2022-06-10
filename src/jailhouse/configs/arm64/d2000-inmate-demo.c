@@ -19,7 +19,8 @@ struct {
 		.signature = JAILHOUSE_CELL_DESC_SIGNATURE,
 		.revision = JAILHOUSE_CONFIG_REVISION,
 		.name = "d2000-inmate-demo",
-		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG,
+		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG |
+				JAILHOUSE_CELL_VIRTUAL_CONSOLE_PERMITTED | JAILHOUSE_CELL_VIRTUAL_CONSOLE_ACTIVE,
 
 		.cpu_set_size = sizeof(config.cpus),
 		.num_memory_regions = ARRAY_SIZE(config.mem_regions),
