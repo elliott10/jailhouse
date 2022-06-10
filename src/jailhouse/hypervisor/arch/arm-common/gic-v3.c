@@ -540,7 +540,9 @@ static int gicv3_inject_irq(u16 irq_id, u16 sender)
 	int free_lr = -1;
 	u32 elsr;
 	u64 lr;
+	u32 priority = 0;
 
+	arm_read_sysreg(ICC_RPR_EL1, priority);
 	arm_read_sysreg(ICH_ELSR_EL2, elsr);
 	for (n = 0; n < gic_num_lr; n++) {
 		if ((elsr >> n) & 1) {
@@ -572,6 +574,7 @@ static int gicv3_inject_irq(u16 irq_id, u16 sender)
 	/* Only group 1 interrupts */
 	lr |= ICH_LR_GROUP_BIT;
 	lr |= ICH_LR_PENDING;
+	lr |= (u64)priority << ICH_LR_PRIORITY_SHIFT;
 	if (!is_sgi(irq_id)) {
 		lr |= ICH_LR_HW_BIT;
 		lr |= (u64)irq_id << ICH_LR_PHYS_ID_SHIFT;
