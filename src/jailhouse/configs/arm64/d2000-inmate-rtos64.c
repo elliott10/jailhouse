@@ -62,17 +62,17 @@ struct {
 			.virt_start = 0x2820c000,
 			.size = 0x2000,
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+				JAILHOUSE_MEM_IO,
 		},
 		/* RAM */ {
-			.phys_start = 0xc0000000,
+			.phys_start = 0x80000000,
 			.virt_start = 0x80000000,
 			.size = 0x10000000,
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
 				JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
 		},
 		/* communication region */ {
-			.virt_start = 0x90000000,
+			.virt_start = 0x80000000,
 			.size = 0x00001000,
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
 				JAILHOUSE_MEM_COMM_REGION,
