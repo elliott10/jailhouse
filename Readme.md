@@ -26,7 +26,7 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 # 3 运行
 
-目前在飞腾FT2000/4和D2000上运行如下示例，测试内核版本为4.19，根文件系统为Ubuntu 18.04。如有需要，可联系飞腾嵌入式软件部获取。
+目前在飞腾FT2000/4、D2000和E2000上运行如下示例，测试内核版本为4.19，根文件系统为Ubuntu 18.04。如有需要，可联系飞腾嵌入式软件部获取。
 
 ## 3.1 设备树保留内存节点
 
@@ -122,6 +122,20 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 	# jailhouse cell start 1;
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_FreeRTOS64.png)
+
+### 3.3.3 e2000测试
+
+#### e2000q测试
+
+64位FreeRTOS运行序列和效果如下所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable e2000q.cell;
+	# jailhouse cell create e2000q-inmate-rtos64.cell;
+	# jailhouse cell load 1 freertos64.bin --address 0xc0100000;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000q_FreeRTOS64.png)
 
 ## 3.4 Linux
 
