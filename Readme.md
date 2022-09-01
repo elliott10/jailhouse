@@ -137,6 +137,27 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000q_FreeRTOS64.png)
 
+32位FreeRTOS运行序列和效果如下所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable e2000q.cell;
+	# jailhouse cell create e2000q-inmate-rtos32.cell;
+	# jailhouse cell load 1 freertos32.bin --address 0xc0100000;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000q_FreeRTOS32.png)
+
+32位VxWorks运行序列和效果如下所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable e2000q.cell;
+	# jailhouse cell create e2000q-inmate-rtos32.cell;
+	# jailhouse cell load 1 vxWorks32.bin --address 0xc0100000;
+	# jailhouse cell start 1;
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000q_vxworks32.png)
+
+
 ## 3.4 Linux
 
 运行non-root Linux除加载Jailhouse驱动和root cell外，还需要提供内核镜像，设备树和根文件系统（目前为Ramdisk），还需要设定合适的启动参数，命令序列和运行效果如下图所示。
