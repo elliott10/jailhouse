@@ -213,5 +213,5 @@ KVM实时内核测试结果：
 
 如有需要，可联系飞腾嵌入式软件部,联系邮箱：
 
-	fangzanbin1274@phytium.com.cn
+	huyuming1672@phytium.com.cn
 	yangshaojun@phytium.com.cn
