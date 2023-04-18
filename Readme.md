@@ -56,6 +56,8 @@ Jailhouse需要保留部分内存空间，在设备树中添加如下节点，�
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/uart.png)
 
 ### 3.2.2 d2000测试
+
+#### 3.2.2.1 UART测试
 D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的裸机程序，命令序列和运行效果如下图所示：
 
 	# modprobe jailhouse;
@@ -65,6 +67,16 @@ D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，�
 	# jailhouse cell start 1;
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_uart.png)
+
+#### 3.2.2.2 IVSHMEM测试
+首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的ivshmem测试程序，命令序列和运行效果如下图所示：
+
+	# modprobe jailhouse;
+	# jailhouse enable d2000.cell;
+	# jailhouse cell create d2000-ivshmem-demo.cell;
+	# jailhouse cell load 1 ivshmem-demo.bin;
+	# jailhouse cell start 1;
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_ivshmem.png)
 
 ## 3.3 RTOS
 
@@ -160,13 +172,25 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 ## 3.4 Linux
 
-运行non-root Linux除加载Jailhouse驱动和root cell外，还需要提供内核镜像，设备树和根文件系统（目前为Ramdisk），还需要设定合适的启动参数，命令序列和运行效果如下图所示。
+与之前的测试不一样，运行non-root Linux除加载Jailhouse驱动和root cell外，还需要提供内核镜像，设备树和根文件系统（目前为Ramdisk），还需要设定合适的启动参数，其中用于non-root Linux的设备树和cell配置需要保持一致。
+
+### 3.4.1 ft2000测试
+ft2000上命令序列和运行效果如下图所示。
 
 	# modprobe jailhouse
 	# jailhouse enable ft2004.cell
 	# jailhouse cell linux -i initrd.ext2 -d ft2004.dtb ft2004-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 root=/dev/ram0  ramdisk_size=0x1000000"
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/linux.png)
+
+### 3.4.2 d2000测试
+d2000上命令序列和运行效果如下图所示。
+
+	# modprobe jailhouse
+	# jailhouse enable d2000.cell
+	# jailhouse cell linux -i initrd.ext2 -d d2000.dtb d2000-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 earlycon=pl011,0x28000000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_linux.png)
 
 # 4 Non-root linux实时性测试
 
@@ -213,5 +237,5 @@ KVM实时内核测试结果：
 
 如有需要，可联系飞腾嵌入式软件部,联系邮箱：
 
-	fangzanbin1274@phytium.com.cn
+	huyuming1672@phytium.com.cn
 	yangshaojun@phytium.com.cn
