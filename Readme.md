@@ -76,7 +76,7 @@ D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，�
 	# jailhouse cell create d2000-ivshmem-demo.cell;
 	# jailhouse cell load 1 ivshmem-demo.bin;
 	# jailhouse cell start 1;
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_ivshmem.png)
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000-ivshmem.png)
 
 ## 3.3 RTOS
 
@@ -190,7 +190,7 @@ d2000上命令序列和运行效果如下图所示。
 	# jailhouse enable d2000.cell
 	# jailhouse cell linux -i initrd.ext2 -d d2000.dtb d2000-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 earlycon=pl011,0x28000000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_linux.png)
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000-linux.png)
 
 # 4 Non-root linux实时性测试
 
