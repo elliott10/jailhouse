@@ -23,6 +23,7 @@ struct {
 #ifdef CONFIG_PCIE_E1000E_TEST
 	struct jailhouse_pci_device pci_devices[3];
 	struct jailhouse_pci_capability pci_caps[11];
+	union jailhouse_stream_id stream_ids[1];
 #else
 	struct jailhouse_pci_device pci_devices[1];
 #endif
@@ -46,7 +47,15 @@ struct {
 			.pci_mmconfig_end_bus = 0xff,
 			.pci_is_virtual = 0,
 			.pci_domain = 0,
-
+#ifdef CONFIG_PCIE_E1000E_TEST
+			.iommu_units= {
+				{
+					.type = JAILHOUSE_IOMMU_SMMUV3,
+					.base = 0x30000000,
+					.size = 0x800000,
+				},
+			},
+#endif
 			.arm = {
 				.gic_version = 3,
 				.gicd_base = 0x30800000, /* GICD */
@@ -66,6 +75,7 @@ struct {
 			.num_pci_devices = ARRAY_SIZE(config.pci_devices),
 #ifdef CONFIG_PCIE_E1000E_TEST
 			.num_pci_caps = ARRAY_SIZE(config.pci_caps),
+			.num_stream_ids = ARRAY_SIZE(config.stream_ids),
 #endif
 
 			.vpci_irq_base = 95-32,
@@ -782,6 +792,11 @@ struct {
 			.len = 12,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
+	},
+
+	.stream_ids = {
+		/* Intel e1000e @02:00.0 */
+		{0x0200},
 	},
 #endif
 
