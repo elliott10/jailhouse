@@ -1,8 +1,15 @@
 /*
- * Jailhouse, a Linux-based partitioning hypervisor
- *
  * Configuration for Phytium e2000q
  *
+ * Copyright (C) 2023, Phytium Technology Co., Ltd.
+ *
+ * Authors:
+ *  fangzanbin <fangzanbin1274@phytium.com.cn>
+ *  yangshaojun <yangshaojun@phytium.com.cn>
+ *  huyuming <huyuming1672@phytium.com.cn>
+ *
+ * This work is licensed under the terms of the GNU GPL, version 2.  See
+ * the COPYING file in the top-level directory.
  */
 
 #include <jailhouse/types.h>
