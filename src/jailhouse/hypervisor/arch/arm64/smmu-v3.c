@@ -363,6 +363,7 @@ struct arm_smmu_device {
 };
 
 static struct arm_smmu_device smmu_devices[JAILHOUSE_MAX_IOMMU_UNITS];
+struct cell *current;
 
 /* Low-level queue manipulation functions */
 static bool queue_full(struct arm_smmu_queue *q)
@@ -574,7 +575,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
 				      u64 *guest_ste, u64 *dst, bool bypass,
 				      u32 vmid)
 {
-	struct paging_structures *pg_structs = &this_cell()->arch.mm;
+	struct paging_structures *pg_structs = &current->arch.mm;
 	u64 val, vttbr;
 
 	val = 0;
@@ -1052,6 +1053,7 @@ static int arm_smmuv3_cell_init(struct cell *cell)
 	if (!iommu_count_units())
 		return 0;
 
+	current = cell;
 	iommu = &system_config->platform_info.iommu_units[0];
 	for (n = 0; n < iommu_count_units(); iommu++, smmu++, n++) {
 		if (iommu->type != JAILHOUSE_IOMMU_SMMUV3)
