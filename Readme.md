@@ -7,28 +7,59 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 # 2 编译
 
-在x86环境下编译Jailhouse,需配置好如下aarch64交叉编译环境，编译python脚本需要python-pip和python-mako软件包，需要注意交叉编译环境和目标机环境的python版本应保持一致：
+（1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机环境运行的内核版本应保持一致，且当前phytium jailhouse只支持linux-kernel 4.19版本，请选择此版本进行调测。
 
-	$ export PATH=/opt/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
+（2）编译内核源码，例如在e2000上，在内核源码路径下执行make e2000_defconfig，然后执行make编译内核镜像。如果是在x86环境下编译，需要额外配置好aarch64交叉编译环境：
+
 	$ export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
+	$ make e2000_defconfig
+	$ make
 
-之后通过环境变量KDIR指定到内核源码树目录，DESTDIR指定编译安装目录，最后使用make install命令编译安装,本例将安装目录定义在用户目录下，~/jailhouse-bin目录：
-	
-	$ make DESTDIR=~/jailhouse-bin KDIR=~/linux_dir install
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/make_kernel_img_with_x86.png)
 
-将安装目录下的子目录拷贝到开发板的根目录
+（3）获取phytium-jailhouse源码，进入到目录phytium-jailhouse/src/jailhouse/下指定内核源码路径：
 
-	$ cp -r ~/jailhouse-bin/* /
-	$ cp -r ~/jailhouse-bin/home/<user>/.local/usr/local/lib/* /usr/local/lib
+	$ export KDIR=~/linux_419/linux-4.19
 
-编译后的cell文件在jailhouse code的configs/arm64目录下，裸机程序在jailhousecode的inmates/demos/arm64目录下。
+（注：~/linux_419/linux-4.19 是本地内核源码路径）
+
+（4）编译Jailhouse，在phytium-jailhouse/src/jailhouse/下执行make，同样，如果是在x86环境下编译，需要配置好aarch64交叉编译环境。
+
+（5）Jailhouse中编译python脚本需要提前安装python3、python3-pip和python3-mako软件包。
+
+（6）编译后的cell文件在jailhouse code的configs/arm64目录下，裸机程序在jailhousecode的inmates/demos/arm64目录下。
 
 
-# 3 运行
+# 3 安装与卸载
+
+在执行Jalhouse命令前，需要先加载jailhouse驱动模块。如果后续涉及到重新编译Jailhouse生成新的文件，则需要卸载后重新加载模块。
+
+（1）如果是在目标机上编译，那么可直接在phytium-jailhouse/src/jailhouse/下执行：
+
+	$ rm /lib/firmware/jailhouse.bin
+	$ cp ./hypervisor/jailhouse.bin /lib/firmware/
+	$ insmod ./driver/jailhouse.ko
+
+如果是在其它环境上编译，则需要把之前编译完后的整个Jailhouse目录拷贝至目标机上，再执行上述命令。
+
+至此，jailhouse模块加载完成。
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/load_module.png)
+
+（2）卸载Jailhouse模块命令：
+
+	$ rmmod jailhouse
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/unload_module.png)
+
+
+# 4 运行
 
 目前在飞腾FT2000/4、D2000和E2000上运行如下示例，测试内核版本为4.19，根文件系统为Ubuntu 20.04。如有需要，可联系飞腾嵌入式软件部获取。
 
-## 3.1 设备树保留内存节点
+此章节的测试实例中加载jailhouse驱动模块命令已省略，模块的安装与卸载请参考第3章节。
+
+## 4.1 设备树保留内存节点
 
 Jailhouse需要保留部分内存空间，在设备树中添加如下节点，保留从0xb0000000开始的256M内存，需要注意这部分内存应与root cell配置文件中的基地址保持一致。
 
@@ -42,12 +73,13 @@ Jailhouse需要保留部分内存空间，在设备树中添加如下节点，�
         };
     };  
 
-## 3.2 裸机程序
+因此，目前只支持加载设备树启动的方式。
 
-### 3.2.1 ft2000测试
+## 4.2 裸机程序
+
+### 4.2.1 ft2000测试
 首先加载jailhouse驱动模块，再加载root cell和non-root cell，在FT2000/4板卡上，ft2004.cell为root cell，主要接管整个系统，ft2004-inmate-demo.cell为non-root cell，从root cell中获取一部分系统资源（共享或者独占），分配给后续加载的裸机程序；最后加载并运行的裸机程序，命令序列和运行效果如下图所示。
 
-	# modprobe jailhouse;
 	# jailhouse enable ft2004.cell;
 	# jailhouse cell create ft2004-inmate-demo.cell;
 	# jailhouse cell load 1 uart-demo.bin;
@@ -55,12 +87,11 @@ Jailhouse需要保留部分内存空间，在设备树中添加如下节点，�
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/uart.png)
 
-### 3.2.2 d2000测试
+### 4.2.2 d2000测试
 
-#### 3.2.2.1 UART测试
+#### 4.2.2.1 UART测试
 D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的裸机程序，命令序列和运行效果如下图所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable d2000.cell;
 	# jailhouse cell create d2000-inmate-demo.cell;
 	# jailhouse cell load 1 uart-demo.bin;
@@ -68,22 +99,20 @@ D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，�
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_uart.png)
 
-#### 3.2.2.2 IVSHMEM测试
+#### 4.2.2.2 IVSHMEM测试
 首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的ivshmem测试程序，命令序列和运行效果如下图所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable d2000.cell;
 	# jailhouse cell create d2000-ivshmem-demo.cell;
 	# jailhouse cell load 1 ivshmem-demo.bin;
 	# jailhouse cell start 1;
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000-ivshmem.png)
 
-## 3.3 RTOS
+## 4.3 RTOS
 
-### 3.3.1 ft2000测试
+### 4.3.1 ft2000测试
 RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTOS和VxWorks，运行32位和64位的系统需要使用不同的inmate文件，32位VxWorks运行序列和效果如下图所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable ft2004.cell;
 	# jailhouse cell create ft2004-inmate-rtos32.cell;
 	# jailhouse cell load 1 vxWorks32.bin --address 0x80100000;
@@ -93,7 +122,6 @@ RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTO
 
 64位FreeRTOS运行序列和效果如下所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable ft2004.cell;
 	# jailhouse cell create ft2004-inmate-rtos64.cell;
 	# jailhouse cell load 1 freertos64.bin --address 0x80100000;
@@ -101,12 +129,11 @@ RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTO
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/freertos64.png)
 
-### 3.3.2 d2000测试
+### 4.3.2 d2000测试
 D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位。
 
 32位VxWorks运行序列和效果如下所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable d2000.cell;
 	# jailhouse cell create d2000-inmate-rtos32.cell;
 	# jailhouse cell load 1 vxWorks32.bin --address 0x80100000;
@@ -116,7 +143,6 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 64位VxWorks运行序列和效果如下所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable d2000.cell;
 	# jailhouse cell create d2000-inmate-rtos64.cell;
 	# jailhouse cell load 1 vxWorks64.bin --address 0x80100000;
@@ -127,7 +153,6 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 64位FreeRTOS运行序列和效果如下所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable d2000.cell;
 	# jailhouse cell create d2000-inmate-rtos64.cell;
 	# jailhouse cell load 1 freertos64.bin --address 0x80100000;
@@ -135,13 +160,12 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_FreeRTOS64.png)
 
-### 3.3.3 e2000测试
+### 4.3.3 e2000测试
 
 #### e2000q测试
 
 64位FreeRTOS运行序列和效果如下所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable e2000q.cell;
 	# jailhouse cell create e2000q-inmate-rtos64.cell;
 	# jailhouse cell load 1 freertos64.bin --address 0xc0100000;
@@ -151,7 +175,6 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 32位FreeRTOS运行序列和效果如下所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable e2000q.cell;
 	# jailhouse cell create e2000q-inmate-rtos32.cell;
 	# jailhouse cell load 1 freertos32.bin --address 0xc0100000;
@@ -161,7 +184,6 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 32位VxWorks运行序列和效果如下所示：
 
-	# modprobe jailhouse;
 	# jailhouse enable e2000q.cell;
 	# jailhouse cell create e2000q-inmate-rtos32.cell;
 	# jailhouse cell load 1 vxWorks32.bin --address 0xc0100000;
@@ -170,29 +192,27 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000q_vxworks32.png)
 
 
-## 3.4 Linux
+## 4.4 Linux
 
 与之前的测试不一样，运行non-root Linux除加载Jailhouse驱动和root cell外，还需要提供内核镜像，设备树和根文件系统（目前为Ramdisk），还需要设定合适的启动参数，其中用于non-root Linux的设备树和cell配置需要保持一致。
 
-### 3.4.1 ft2000测试
+### 4.4.1 ft2000测试
 ft2000上命令序列和运行效果如下图所示。
 
-	# modprobe jailhouse
 	# jailhouse enable ft2004.cell
 	# jailhouse cell linux -i initrd.ext2 -d ft2004.dtb ft2004-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 root=/dev/ram0  ramdisk_size=0x1000000"
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/linux.png)
 
-### 3.4.2 d2000测试
+### 4.4.2 d2000测试
 d2000上命令序列和运行效果如下图所示。
 
-	# modprobe jailhouse
 	# jailhouse enable d2000.cell
 	# jailhouse cell linux -i initrd.ext2 -d d2000.dtb d2000-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 earlycon=pl011,0x28000000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000-linux.png)
 
-# 4 Non-root linux实时性测试
+# 5 Non-root linux实时性测试
 
 测试使用了stress和while循环脚本（均运行四个进程）来增加系统负载，命令如下：
 
@@ -233,7 +253,7 @@ KVM实时内核测试结果：
 根据上面的测试结果可知：相比KVM虚拟化，Jailhouse虚拟化的实时性更好。
 
 
-# 5 其他
+# 6 其他
 
 如有需要，可联系飞腾嵌入式软件部,联系邮箱：
 
