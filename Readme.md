@@ -9,6 +9,13 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 （1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机环境运行的内核版本应保持一致，且当前phytium jailhouse只支持linux-kernel 4.19版本，请选择此版本进行调测。
 
+e2000内核源码获取命令：
+
+	$ git clone https://gitee.com/phytium_embedded/phytium-linux-kernel.git
+	$ git checkout linux-4.19
+
+d2000和ft2000的内核源码请联系飞腾嵌入式软件部获取。
+
 （2）编译内核源码，例如在e2000上，在内核源码路径下执行make e2000_defconfig，然后执行make编译内核镜像。如果是在x86环境下编译，需要额外配置好aarch64交叉编译环境：
 
 	$ export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
@@ -19,9 +26,9 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 （3）获取phytium-jailhouse源码，进入到目录phytium-jailhouse/src/jailhouse/下指定内核源码路径：
 
-	$ export KDIR=~/linux_419/linux-4.19
+	$ export KDIR=~/linux_419/phytium-linux-kernel
 
-（注：~/linux_419/linux-4.19 是本地内核源码路径）
+（注：~/linux_419/phytium-linux-kernel 是本地内核源码路径）
 
 （4）编译Jailhouse，在phytium-jailhouse/src/jailhouse/下执行make，同样，如果是在x86环境下编译，需要配置好aarch64交叉编译环境。
 
