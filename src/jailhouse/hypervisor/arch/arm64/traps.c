@@ -33,6 +33,26 @@ void arch_skip_instruction(struct trap_context *ctx)
 	arm_write_sysreg(ELR_EL2, pc);
 }
 
+static enum trap_return handle_cp15_64(struct trap_context *ctx)
+{
+	u32 esr = ctx->esr;
+	u32 rt  = (esr >> 5) & 0x1f;
+
+	/* All handled registers are write-only. */
+	if (esr & 1)
+		return TRAP_UNHANDLED;
+
+	/* Guest CP15 access to ICC_SGI1R. */
+	if (ESR_MATCH_MCRR_MRRC(esr, 0, 12)) {
+		if (!gicv3_handle_sgir_write(rt == 31 ? 0 : ctx->regs[rt]))
+			return TRAP_UNHANDLED;
+	}
+
+	arch_skip_instruction(ctx);
+
+	return TRAP_HANDLED;
+}
+
 static enum trap_return handle_hvc(struct trap_context *ctx)
 {
 	unsigned long *regs = ctx->regs;
@@ -163,6 +183,7 @@ static void fill_trap_context(struct trap_context *ctx, union registers *regs)
 
 static const trap_handler trap_handlers[0x40] =
 {
+	[ESR_EC_CP15_64]	= handle_cp15_64,
 	[ESR_EC_HVC64]		= handle_hvc,
 	[ESR_EC_SMC64]		= handle_smc,
 	[ESR_EC_SYS64]		= handle_sysreg,

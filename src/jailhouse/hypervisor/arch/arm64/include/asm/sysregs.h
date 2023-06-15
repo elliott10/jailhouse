@@ -155,6 +155,10 @@
 #define ESR_EC_VECTOR32		0x3A
 #define ESR_EC_BRK64		0x3C
 
+#define ESR_MATCH_MCRR_MRRC(esr, opc1, crm)			\
+	(((esr) & (BIT_MASK(19, 16) | BIT_MASK(4, 1))) ==	\
+	 (((opc1) << 16) | ((crm) << 1)))
+
 #define ESR_MATCH_MSR_MRS(esr, op0, op1, crn, crm, op2)		\
 	(((esr) & (BIT_MASK(21, 10) | BIT_MASK(4, 1))) ==	\
 	 (((op0) << 20) | ((op2) << 17) | ((op1) << 14) |	\
