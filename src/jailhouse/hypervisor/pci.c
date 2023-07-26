@@ -61,9 +61,13 @@ static const struct pci_cfg_control bridge_write[PCI_CONFIG_HEADER_SIZE] = {
 	[0x04/4] = {PCI_CONFIG_ALLOW,  0xffffffff}, /* Command, Status */
 	[0x0c/4] = {PCI_CONFIG_ALLOW,  0xffffffff}, /* BIST, Header Type (r/o),
 						       Latency, Cacheline */
+	[0x10/4] = {PCI_CONFIG_ALLOW, 0xffffffff}, /* Base Address Register 0 */
+	[0x14/4] = {PCI_CONFIG_ALLOW, 0xffffffff}, /* Base Address Register 1 */
+	[0x18/4] = {PCI_CONFIG_ALLOW, 0xffffffff}, /* Primary Bus Number,Secondary Bus Number,Subordinate Bus Number,Secondary Latency Timer */
 	[0x1c/4] = {PCI_CONFIG_RDONLY, 0x0000ffff}, /* I/O Limit & Base */
 	[0x20/4 ...      /* Memory Limit/Base, Prefetch Memory Limit/Base, */
 	 0x30/4] = {PCI_CONFIG_RDONLY, 0xffffffff}, /* I/O Limit & Base */
+	[0x38/4] = {PCI_CONFIG_ALLOW, 0xffffffff}, /* Expansion ROM Base Address */
 	[0x3c/4] = {PCI_CONFIG_ALLOW,  0xffff00ff}, /* Int Line, Bridge Ctrl */
 };
 
