@@ -571,12 +571,6 @@ void pci_reset_device(struct pci_device *device)
 					     device->msix_vectors[n].raw[3]);
 	}
 
-	/*
-	 * Silence INTx of the physical device by setting the mask bit.
-	 * This is a deviation from the specified reset state.
-	 */
-	pci_write_config(device->info->bdf, PCI_CFG_COMMAND,
-			 PCI_CMD_INTX_OFF, 2);
 }
 
 static int pci_add_physical_device(struct cell *cell, struct pci_device *device)
