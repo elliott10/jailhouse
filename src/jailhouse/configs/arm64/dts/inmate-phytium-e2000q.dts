@@ -1,16 +1,14 @@
 /*
- * Jailhouse, a Linux-based partitioning hypervisor
- *
  * Configuration for phytium e2000q chip linux demo,
  * corresponding to configs/arm64/phytium-e2000q-linux-demo.c.
  *
- * Copyright (c) Phytium Technology Co., Ltd.
+ * Copyright (C) 2023, Phytium Technology Co., Ltd.
  *
  * Authors:
- *  Shaojun Yang <yangshaojun@phytium.com.cn>
+ *  yangshaojun <yangshaojun@phytium.com.cn>
  *
- * This work is licensed under the terms of the GNU GPL, version 2.
- * See the COPYING file in the top-level directory.
+ * This work is licensed under the terms of the GNU GPL, version 2.  See
+ * the COPYING file in the top-level directory.
  */
 
 /dts-v1/;
@@ -182,7 +180,6 @@
 			#size-cells = <0x02>;
 			#interrupt-cells = <0x01>;
 			reg = <0x00 0x40000000 0x00 0x10000000>;
-			msi-parent = <&its>;
 			bus-range = <0x00 0xff>;
 			interrupt-map-mask = <0x00 0x00 0x00 0x07>;
 			interrupt-map = <0x00 0x00 0x00 0x01 0x01 0x00 0x00 0x00 0x04 0x04
