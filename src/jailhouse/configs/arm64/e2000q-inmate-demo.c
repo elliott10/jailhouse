@@ -3,7 +3,7 @@
  *
  * Configuration for phytium e2000q chip.
  *
- * Copyright (c) Phytium Technology Co., Ltd.
+ * Copyright (C) 2023, Phytium Technology Co., Ltd.
  *
  * Authors:
  *  Shaojun Yang <yangshaojun@phytium.com.cn>
