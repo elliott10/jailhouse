@@ -1,7 +1,7 @@
 /*
  * Configuration for linux-demo inmate on Phytium d2000
  *
- * Copyright (C) 2023, Phytium Technology Co., Ltd.
+ * Copyright (c) 2023 Phytium Technology Co., Ltd.
  *
  * Authors:
  *  yangshaojun <yangshaojun@phytium.com.cn>

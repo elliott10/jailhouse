@@ -1,7 +1,7 @@
 /*
  * Configuration for demo inmate on Phytium FT2000/4
  *
- * Copyright (C) 2023, Phytium Technology Co., Ltd.
+ * Copyright (c) 2021-2023 Phytium Technology Co., Ltd.
  *
  * Authors:
  *  shixiaofeng <shixiaofeng@phytium.com.cn>

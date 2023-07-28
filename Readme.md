@@ -235,7 +235,7 @@ d2000上命令序列和运行效果如下图所示。
 
 并且加入相关中断：
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_int_config)
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_int_config.png)
 
 e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 
@@ -273,7 +273,7 @@ e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 
 并且加入相关中断：
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_int_config)
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_int_config.png)
 
 e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 
