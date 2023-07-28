@@ -7,12 +7,11 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 # 2 编译
 
-（1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机环境运行的内核版本应保持一致，且当前phytium jailhouse只支持linux-kernel 4.19版本，请选择此版本进行调测。
+（1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机环境运行的内核版本应保持一致，且当前phytium jailhouse支持的内核版本与phytium开源内核Phytium-Linux-Kernel一致（即linux-kernel 4.19 和 5.10 版本），请选择使用phytium开源内核进行调测。
 
 e2000内核源码获取命令：
 
 	$ git clone https://gitee.com/phytium_embedded/phytium-linux-kernel.git
-	$ git checkout linux-4.19
 
 d2000和ft2000的内核源码请联系飞腾嵌入式软件部获取。
 
@@ -236,7 +235,7 @@ d2000上命令序列和运行效果如下图所示。
 
 并且加入相关中断：
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_int_config)
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_int_config.png)
 
 e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 
@@ -274,7 +273,7 @@ e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 
 并且加入相关中断：
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_int_config)
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_int_config.png)
 
 e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 
