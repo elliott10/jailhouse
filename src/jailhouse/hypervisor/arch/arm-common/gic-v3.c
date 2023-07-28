@@ -353,8 +353,6 @@ static enum mmio_result gicv3_handle_redist_access(void *arg,
 	switch (mmio->address) {
 	case GICR_TYPER:
 		mmio_perform_access(cpu_public->gicr.base, mmio);
-		if (cpu_public->cpu_id == last_gicr)
-				mmio->value |= GICR_TYPER_Last;
 		return MMIO_HANDLED;
 	case GICR_TYPER + 4:
 		mmio_perform_access(cpu_public->gicr.base, mmio);
