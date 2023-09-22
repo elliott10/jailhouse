@@ -18,7 +18,7 @@
 struct {
 	struct jailhouse_cell_desc cell;
 	__u64 cpus[1];
-	struct jailhouse_memory mem_regions[11];
+	struct jailhouse_memory mem_regions[6];
 	struct jailhouse_irqchip irqchips[1];
 #ifdef CONFIG_PCIE_E1000E_TEST
 	struct jailhouse_pci_device pci_devices[3];
@@ -40,6 +40,7 @@ struct {
 #ifdef CONFIG_PCIE_E1000E_TEST
 		.num_pci_caps = ARRAY_SIZE(config.pci_caps),
 #endif
+		.cpu_reset_address = 0x0,
 
 		.console = {
 			.address = 0x2800d000,
@@ -53,44 +54,6 @@ struct {
 	},
 
 	.mem_regions = {
-		/* IVSHMEM shared memory regions (demo) */
-		{
-			.phys_start = 0xb1000000,
-			.virt_start = 0xb1000000,
-			.size = 0x1000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		{
-			.phys_start = 0xb1001000,
-			.virt_start = 0xb1001000,
-			.size = 0x9000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		{
-			.phys_start = 0xb100a000,
-			.virt_start = 0xb100a000,
-			.size = 0x2000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		{
-			.phys_start = 0xb100c000,
-			.virt_start = 0xb100c000,
-			.size = 0x2000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		{
-			.phys_start = 0xb100e000,
-			.virt_start = 0xb100e000,
-			.size = 0x2000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_ROOTSHARED,
-		},
-		{
-			.phys_start = 0xb1100000,
-			.virt_start = 0,
-			.size = 0x800000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
-		},
-
 		/* UART 1 */
 		{
 			.phys_start = 0x2800d000,
@@ -115,10 +78,18 @@ struct {
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE,
 		},
 
-		/* RAM */
+		/* RAM: for linux-loader space */
 		{
 			.phys_start = 0x2000000000,
-			.virt_start = 0x2000000000,
+			.virt_start = 0x0,
+			.size = 0x00010000, /* 64KB */
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
+		},
+
+		/* RAM */
+		{
+			.phys_start = 0x2000080000,
+			.virt_start = 0x2000080000,
 			.size = 0x40000000,
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE | JAILHOUSE_MEM_DMA,
 		},
