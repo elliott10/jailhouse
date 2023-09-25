@@ -18,7 +18,7 @@
 struct {
 	struct jailhouse_system header;
 	__u64 cpus[1];
-	struct jailhouse_memory mem_regions[76];
+	struct jailhouse_memory mem_regions[78];
 	struct jailhouse_irqchip irqchips[1];
 #ifdef CONFIG_PCIE_E1000E_TEST
 	struct jailhouse_pci_device pci_devices[3];
@@ -413,6 +413,19 @@ struct {
 			.flags		= JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO,
 		},
 
+		/* EDAC */
+		{
+			.phys_start = 0x31400000,
+			.virt_start = 0x31400000,
+			.size           = 0x2000,
+			.flags          = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO,
+		},
+		{
+			.phys_start = 0x32B28000,
+			.virt_start = 0x32B28000,
+			.size           = 0x1000,
+			.flags          = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO,
+		},
 		/* usb_vhub0: OTG */
 		{
 			.phys_start = 0x31800000,
