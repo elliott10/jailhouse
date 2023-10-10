@@ -303,26 +303,124 @@ e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_usb.png)
 
 #### 4.4.3.5 pcie测试
-针对PCIE设备的测试，我们以常见设Intel e1000e网卡作为实例。在配置文件“e2000q.c”以及“e2000q-linux-demo.c“中已加入相关配置，并用宏进行控制，若需要使用，请自行定义相关宏以使用：
+说明： 针对PCIE设备的测试，我们以Intel e1000e网卡作为实例。在配置文件“e2000q.c”以及“e2000q-linux-demo.c“中用宏进行控制，若需要使用，请自行定义相关宏。
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_e1000e_config.png)
+（1）首先要在root cell里加入PCIE的相关配置
 
-e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
+在configs/arm64/e2000q.c中加入如下内容：
 
-	# jailhouse enable e2000q.cell
-        # jailhouse cell linux -i initrd.ext2 -d e2000q.dtb e2000q-linux-demo.cell /boot/Image -c "console=ttyAMA1,115200 earlycon=pl011,0x2800d000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
+![输入图片说明](pic/e2000_linux_pcie_rootcell_config_1.png)
 
-然后在分配给non-root cell的串口通过命令来使用e1000e网卡，效果如下所示：
+![输入图片说明](pic/e2000_linux_pcie_rootcell_config_2.png)
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_e1000e.png)
+![输入图片说明](pic/e2000_linux_pcie_rootcell_config_3.png)
 
+![输入图片说明](pic/e2000_linux_pcie_rootcell_config_4.png)
+
+![输入图片说明](pic/e2000_linux_pcie_rootcell_config_5.png)
+
+（2）然后需要在non-root cell里加入PCIE的相关配置
+
+在configs/arm64/e2000q-linux-demo.c中加入如下内容：
+
+![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_1.png)
+
+![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_2.png)
+
+![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_3.png)
+
+![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_4.png)
+
+![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_5.png)
+
+（3）添加pcie legacy中断
+
+![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_6.png)
+
+（4）在phytium-jailhouse/src/jailhouse/下执行：
+
+注意：下面的命令中的路径请根据自己的情况进行调整。
+
+	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+	# insmod driver/jailhouse.ko
+	# jailhouse enable configs/arm64/e2000q.cell
+	# ./tools/jailhouse-cell-linux \
+	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+	# -d configs/arm64/dts/inmate-phytium-e2000q.dtb \
+	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+	# configs/arm64/e2000q-linux-demo.cell \
+	# /root/linux-kernel/arch/arm64/boot/Image \  /* e2000内核代码详见飞腾官方，只在4.19内核版本测试通过 */
+
+（5）测试结果
+
+注意：下面的命令均在guest os里运行
+
+![输入图片说明](pic/e2000_linux_pcie_output_1.png)
+
+![输入图片说明](pic/e2000_linux_pcie_output_2.png)
+
+下面的截图是从其他主机上ping jailhouse的虚拟机IP地址：
+
+![输入图片说明](pic/e2000_linux_pcie_output_3.png)
+
+测试通过
+
+#### 4.4.3.6 smmu测试
+（1）前置条件
+
+root-cell 和 non-root cell 的配置和PCIE测试中保持一致，要求PCIE测试能通过。
+
+需要对宿主机的内核配置进行处理，禁用smmu。
+
+![输入图片说明](pic/e2000_linux_smmu_1.png)
+
+（2）使能和配置SMMU-V3
+
+non-root cell 配置文件加入以下内容:
+
+![输入图片说明](pic/e2000_linux_smmu_non_root_cell_config_1.png)
+
+![输入图片说明](pic/e2000_linux_smmu_non_root_cell_config_2.png)
+
+![输入图片说明](pic/e2000_linux_smmu_non_root_cell_config_3.png)
+
+root cell 配置文件加入以下内容:
+
+![输入图片说明](pic/e2000_linux_smmu_root_cell_config_1.png)
+
+![输入图片说明](pic/e2000_linux_smmu_root_cell_config_2.png)
+
+（3）测试步骤
+
+smmu-v3使能前提下，pci legacy中断功能测试。
+
+注意：下面的命令中的路径请根据自己的情况进行调整。
+
+      # make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+      # insmod driver/jailhouse.ko
+      # jailhouse enable configs/arm64/e2000q.cell
+      # ./tools/jailhouse-cell-linux \
+      # -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+      # -d configs/arm64/dts/inmate-phytium-e2000q.dtb \
+      # -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+      # configs/arm64/e2000q-linux-demo.cell \
+      # /root/linux-kernel/arch/arm64/boot/Image \  /* e2000内核代码详见飞腾官方，只在4.19内核版本测试通过 */
+
+
+（4） 测试结果：
+
+![输入图片说明](pic/e2000_linux_smmu_output_1.png)
+
+![输入图片说明](pic/e2000_linux_smmu_output_2.png)
+
+![输入图片说明](pic/e2000_linux_smmu_output_3.png)
+
+![输入图片说明](pic/e2000_linux_smmu_output_4.png)
 
 # 5 Non-root linux实时性测试
-
 测试使用了stress和while循环脚本（均运行四个进程）来增加系统负载，命令如下：
 
 	$ stress -c 4
-
 	$ while true;  do
 	  ifconfig lo up;
 	done &
