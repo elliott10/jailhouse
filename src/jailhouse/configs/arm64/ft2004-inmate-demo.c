@@ -1,15 +1,16 @@
 /*
- * Configuration for demo inmate on Phytium FT2000/4
+ * Jailhouse, a Linux-based partitioning hypervisor
  *
- * Copyright (c) 2021-2023 Phytium Technology Co., Ltd.
+ * Configuration for phytium ft2000/4 chip.
+ *
+ * Copyright (c) Phytium Technology Co., Ltd.
  *
  * Authors:
  *  shixiaofeng <shixiaofeng@phytium.com.cn>
- *  yangshaojun <yangshaojun@phytium.com.cn>
- *  huyuming <huyuming1672@phytium.com.cn>
+ *  Shaojun Yang <yangshaojun@phytium.com.cn>
  *
- * This work is licensed under the terms of the GNU GPL, version 2.  See
- * the COPYING file in the top-level directory.
+ * This work is licensed under the terms of the GNU GPL, version 2.
+ * See the COPYING file in the top-level directory.
  */
 
 #include <jailhouse/types.h>
@@ -25,7 +26,7 @@ struct {
 	.cell = {
 		.signature = JAILHOUSE_CELL_DESC_SIGNATURE,
 		.revision = JAILHOUSE_CONFIG_REVISION,
-		.name = "ft2004-inmate-demo",
+		.name = "inmate-demo",
 		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG,
 
 		.cpu_set_size = sizeof(config.cpus),
@@ -33,19 +34,15 @@ struct {
 		.num_irqchips = ARRAY_SIZE(config.irqchips),
 		.num_pci_devices = ARRAY_SIZE(config.pci_devices),
 
-		.vpci_irq_base = 101,
-				
 		.console = {
-			.address = 0x28000000,
-			.divider = 0x1a,
+			.address = 0x28001000,
 			.type = JAILHOUSE_CON_TYPE_PL011,
-			.flags = JAILHOUSE_CON_ACCESS_MMIO |
-				 JAILHOUSE_CON_REGDIST_4,
+			.flags = JAILHOUSE_CON_ACCESS_MMIO | JAILHOUSE_CON_REGDIST_4,
 		},
 	},
 
 	.cpus = {
-		0x2,
+		0x1,
 	},
 
 	.irqchips = {
@@ -73,8 +70,7 @@ struct {
 			.phys_start = 0xb1001000,
 			.virt_start = 0xb1001000,
 			.size = 0x9000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_ROOTSHARED,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_ROOTSHARED,
 		},
 		{
 			.phys_start = 0xb100a000,
@@ -86,8 +82,7 @@ struct {
 			.phys_start = 0xb100c000,
 			.virt_start = 0xb100c000,
 			.size = 0x2000,
-			.flags = JAILHOUSE_MEM_READ  | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_ROOTSHARED,
+			.flags = JAILHOUSE_MEM_READ  | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_ROOTSHARED,
 		},
 		{
 			.phys_start = 0xb100e000,
@@ -95,32 +90,32 @@ struct {
 			.size = 0x2000,
 			.flags = JAILHOUSE_MEM_READ  | JAILHOUSE_MEM_ROOTSHARED,
 		},
-		/* UART */{
-			.phys_start = 0x28000000,
-			.virt_start = 0x28000000,
+
+		/* UART 1 */ {
+			.phys_start = 0x28001000,
+			.virt_start = 0x28001000,
 			.size = 0x1000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO  | JAILHOUSE_MEM_ROOTSHARED,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO  | JAILHOUSE_MEM_ROOTSHARED,
 		},
+
 		/* ETH1 */ {
 			.phys_start = 0x2820c000,
 			.virt_start = 0x2820c000,
 			.size = 0x2000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
 		},
+
 		/* RAM */ {
-			.phys_start = 0xb2000000,
+			.phys_start = 0x2000000000,
 			.virt_start = 0,
-			.size = 0x01000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
+			.size = 0x00100000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
 		},
+
 		/* communication region */ {
 			.virt_start = 0x80000000,
 			.size = 0x00001000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_COMM_REGION,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_COMM_REGION,
 		},
 	},
 
