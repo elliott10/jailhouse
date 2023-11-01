@@ -1,15 +1,16 @@
 /*
- * Configuration for Phytium FT2000/4
+ * Jailhouse, a Linux-based partitioning hypervisor
  *
- * Copyright (c) 2021-2023 Phytium Technology Co., Ltd.
+ * Configuration for phytium ft2000/4 chip.
+ *
+ * Copyright (c) Phytium Technology Co., Ltd.
  *
  * Authors:
  *  shixiaofeng <shixiaofeng@phytium.com.cn>
- *  yangshaojun <yangshaojun@phytium.com.cn>
- *  huyuming <huyuming1672@phytium.com.cn>
+ *  Shaojun Yang <yangshaojun@phytium.com.cn>
  *
- * This work is licensed under the terms of the GNU GPL, version 2.  See
- * the COPYING file in the top-level directory.
+ * This work is licensed under the terms of the GNU GPL, version 2.
+ * See the COPYING file in the top-level directory.
  */
 
 #include <jailhouse/types.h>
@@ -28,28 +29,27 @@ struct {
 		.flags = JAILHOUSE_SYS_VIRTUAL_DEBUG_CONSOLE,
 		.hypervisor_memory = {
 			.phys_start = 0xb0000000,
-			.size =       0x01000000,
+			.size = 0x01000000,
 		},
 		.debug_console = {
 			.address = 0x28001000,
 			.size = 0x1000,
 			.type = JAILHOUSE_CON_TYPE_PL011,
-			.flags = JAILHOUSE_CON_ACCESS_MMIO |
-				 JAILHOUSE_CON_REGDIST_4,
+			.flags = JAILHOUSE_CON_ACCESS_MMIO | JAILHOUSE_CON_REGDIST_4,
 		},
 		.platform_info = {
-			.pci_mmconfig_base = 0x30000000,
-			.pci_mmconfig_end_bus = 0,
-			.pci_is_virtual = 1,
-			.pci_domain = 1,
+			.pci_mmconfig_base = 0x40000000,
+			.pci_mmconfig_end_bus = 0xff,
+			.pci_is_virtual = 0,
+			.pci_domain = 0,
 
 			.arm = {
 				.gic_version = 3,
-				.gicd_base = 0x29900000,
-				.gicr_base = 0x29980000,
-				.gicc_base = 0x29c00000,
-				.gich_base = 0x29c10000,
-				.gicv_base = 0x29c20000,
+				.gicd_base = 0x29900000, /* GICD */
+				.gicr_base = 0x29980000, /* GICR */
+				.gicc_base = 0x29c00000, /* GICC */
+				.gich_base = 0x29c10000, /* GICH */
+				.gicv_base = 0x29c20000, /* GICV */
 				.maintenance_irq = 25,
 			},
 		},
@@ -101,21 +101,22 @@ struct {
 			.size = 0x2000,
 			.flags = JAILHOUSE_MEM_READ,
 		},
-		/* Main memory */
+
+		/* Main Memory Address Space */
+		/* RAM-0 */
 		{
 			.phys_start = 0x80000000,
 			.virt_start = 0x80000000,
-			.size =	      0x80000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_EXECUTE,
+			.size =	0x80000000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE,
 		},
-		/* Main memory */
+
+		/* RAM-1 */
 		{
 			.phys_start = 0x2000000000,
 			.virt_start = 0x2000000000,
-			.size =	      0x380000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_EXECUTE,
+			.size = 0x380000000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE,
 		},
 		/* UART 0-3 */
 		{
