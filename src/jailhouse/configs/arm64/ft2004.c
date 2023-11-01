@@ -115,7 +115,7 @@ struct {
 		{
 			.phys_start = 0x2000000000,
 			.virt_start = 0x2000000000,
-			.size = 0x380000000,
+			.size = 0x2000000000, //Maximum support 128G
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE,
 		},
 		/* UART 0-3 */
