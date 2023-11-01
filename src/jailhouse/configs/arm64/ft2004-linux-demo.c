@@ -25,7 +25,7 @@ struct {
 	.cell = {
 		.signature = JAILHOUSE_CELL_DESC_SIGNATURE,
 		.revision = JAILHOUSE_CONFIG_REVISION,
-		.name = "ft2004-linux-demo",
+		.name = "linux-demo",
 		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG,
 
 		.cpu_set_size = sizeof(config.cpus),
@@ -36,7 +36,7 @@ struct {
 		.vpci_irq_base = 102,
 
 		.console = {
-			.address = 0x28000000,
+			.address = 0x28001000,
 			.type = JAILHOUSE_CON_TYPE_PL011,
 			.flags = JAILHOUSE_CON_ACCESS_MMIO |
 				 JAILHOUSE_CON_REGDIST_4,
@@ -44,7 +44,7 @@ struct {
 	},
 
 	.cpus = {
-		0xc,
+		0x3,
 	},
 
 	.mem_regions = {
@@ -81,33 +81,36 @@ struct {
 			.size = 0x2000,
 			.flags = JAILHOUSE_MEM_READ  | JAILHOUSE_MEM_ROOTSHARED,
 		},
-		/* UART0 */ {
-			.phys_start = 0x28000000,
-			.virt_start = 0x28000000,
+
+		/* UART 0 */
+		{
+			.phys_start = 0x28001000,
+			.virt_start = 0x28001000,
 			.size = 0x1000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
 		},
-		/* RAM */ {
-			.phys_start = 0xb1100000,
+
+		/* RAM: for linux-loader space */
+		{
+			.phys_start = 0x2000000000,
 			.virt_start = 0,
-			.size = 0x10000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
+			.size = 0x00010000, /* 64KB */
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
 		},
-		/* RAM */ {
-			.phys_start = 0xb2000000,
-			.virt_start = 0xb2000000,
-			.size = 0x1d000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_DMA |
-				JAILHOUSE_MEM_LOADABLE,
+
+		/* RAM */
+		{
+			.phys_start = 0x2000080000,
+			.virt_start = 0x2000080000,
+			.size = 0x40000000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_DMA | JAILHOUSE_MEM_LOADABLE,
 		},
-		/* communication region */ {
+
+		/* communication region */
+		{
 			.virt_start = 0x80000000,
 			.size = 0x00001000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_COMM_REGION,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_COMM_REGION,
 		},
 	},
 
