@@ -38,18 +38,18 @@ struct {
 				 JAILHOUSE_CON_REGDIST_4,
 		},
 		.platform_info = {
-			.pci_mmconfig_base = 0x30000000,
-			.pci_mmconfig_end_bus = 0,
-			.pci_is_virtual = 1,
-			.pci_domain = 1,
+			.pci_mmconfig_base = 0x40000000,
+			.pci_mmconfig_end_bus = 0xff,
+			.pci_is_virtual = 0,
+			.pci_domain = 0,
 
 			.arm = {
 				.gic_version = 3,
-				.gicd_base = 0x29a00000,
-				.gicr_base = 0x29b00000,
-				.gicc_base = 0x29c00000,
-				.gich_base = 0x29c10000,
-				.gicv_base = 0x29c20000,
+				.gicd_base = 0x29a00000, /* GICD */
+				.gicr_base = 0x29b00000, /* GICR */
+				.gicc_base = 0x29c00000, /* GICC */
+				.gich_base = 0x29c10000, /* GICH */
+				.gicv_base = 0x29c20000, /* GICV */
 				.maintenance_irq = 25,
 			},
 		},
