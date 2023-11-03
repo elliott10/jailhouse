@@ -167,7 +167,7 @@ struct {
 		{
 			.id = PCI_CAP_ID_EXP,
 			.start = 0x80,
-			.len = 64,
+			.len = 60,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		{
@@ -179,7 +179,7 @@ struct {
 		{
 			.id = PCI_CAP_ID_MSI,
 			.start = 0xe0,
-			.len = 32,
+			.len = 14,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		{
@@ -211,9 +211,9 @@ struct {
 		},
 		/* Intel e1000e @02:00.0 --PCI Express Capability Structure */
 		{
-			.id = PCI_CAP_ID_MSI,
+			.id = PCI_CAP_ID_EXP,
 			.start = 0xe0,
-			.len = 56,
+			.len = 60,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		/* Intel e1000e @02:00.0 --MSI-X Capability Structures */

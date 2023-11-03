@@ -66,7 +66,7 @@ struct {
 			},
 		},
 		.root_cell = {
-			.name = "phytium-e2000q",
+			.name = "e2000q",
 
 			.cpu_set_size = sizeof(config.cpus),
 			.num_memory_regions = ARRAY_SIZE(config.mem_regions),
@@ -721,7 +721,7 @@ struct {
 		{
 			.id = PCI_CAP_ID_EXP,
 			.start = 0x80,
-			.len = 64,
+			.len = 60,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		{
@@ -733,19 +733,19 @@ struct {
 		{
 			.id = PCI_CAP_ID_MSI,
 			.start = 0xe0,
-			.len = 32,
+			.len = 14,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		{
 			.id = PCI_CAP_ID_PM,
 			.start = 0xf8,
-			.len = 12,
+			.len = 8,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		{
 			.id = PCI_EXT_CAP_ID_ERR,
 			.start = 0x200,
-			.len = 68,
+			.len = 60,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 
@@ -753,7 +753,7 @@ struct {
 		{
 			.id = PCI_CAP_ID_PM,
 			.start = 0xc8,
-			.len = 12,
+			.len = 8,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		/* Intel e1000e @02:00.0 --MSI Capability Structures */
@@ -767,7 +767,7 @@ struct {
 		{
 			.id = PCI_CAP_ID_EXP,
 			.start = 0xe0,
-			.len = 56,
+			.len = 60,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		/* Intel e1000e @02:00.0 --MSI-X Capability Structures */
@@ -781,7 +781,7 @@ struct {
 		{
 			.id = PCI_EXT_CAP_ID_ERR,
 			.start = 0x100,
-			.len = 68,
+			.len = 60,
 			.flags = JAILHOUSE_PCICAPS_WRITE,
 		},
 		/* Intel e1000e @02:00.0 --Device Serial Number Capability */
