@@ -1,9 +1,8 @@
 /*
  * Jailhouse, a Linux-based partitioning hypervisor
  *
- * Configuration for phytium ft2000/4 chip.
- *
- * Copyright (c) Phytium Technology Co., Ltd.
+ * Configuration for Phytium FT-2000/4
+ * Copyright (c) 2021-2023 Phytium Technology Co., Ltd
  *
  * Authors:
  *  shixiaofeng <shixiaofeng@phytium.com.cn>

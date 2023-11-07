@@ -1,8 +1,10 @@
 /*
- * Configuration for phytium e2000q chip linux demo,
- * corresponding to configs/arm64/phytium-e2000q-linux-demo.c.
+ * Jailhouse, a Linux-based partitioning hypervisor
  *
- * Copyright (C) 2023, Phytium Technology Co., Ltd.
+ * Configuration for Phytium E2000Q,
+ * corresponding to configs/arm64/e2000q-linux-demo.c
+ *
+ * Copyright (c) 2022-2023 Phytium Technology Co., Ltd
  *
  * Authors:
  *  yangshaojun <yangshaojun@phytium.com.cn>
