@@ -25,26 +25,25 @@ struct {
 	.cell = {
 		.signature = JAILHOUSE_CELL_DESC_SIGNATURE,
 		.revision = JAILHOUSE_CONFIG_REVISION,
-		.name = "d2000-linux-demo",
-		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG,
+		.name = "linux-demo",
+		.flags = JAILHOUSE_CELL_PASSIVE_COMMREG | JAILHOUSE_CON_REGDIST_4,
 
 		.cpu_set_size = sizeof(config.cpus),
 		.num_memory_regions = ARRAY_SIZE(config.mem_regions),
 		.num_irqchips = ARRAY_SIZE(config.irqchips),
 		.num_pci_devices = ARRAY_SIZE(config.pci_devices),
 
-		.vpci_irq_base = 102,
+		.cpu_reset_address = 0x0,
 
 		.console = {
-			.address = 0x28000000,
+			.address = 0x28001000,
 			.type = JAILHOUSE_CON_TYPE_PL011,
-			.flags = JAILHOUSE_CON_ACCESS_MMIO |
-				 JAILHOUSE_CON_REGDIST_4,
+			.flags = JAILHOUSE_CON_ACCESS_MMIO | JAILHOUSE_CON_REGDIST_4,
 		},
 	},
 
 	.cpus = {
-		0xc,
+		0xf,
 	},
 
 	.mem_regions = {
@@ -81,9 +80,9 @@ struct {
 			.size = 0x2000,
 			.flags = JAILHOUSE_MEM_READ  | JAILHOUSE_MEM_ROOTSHARED,
 		},
-		/* UART0 */ {
-			.phys_start = 0x28000000,
-			.virt_start = 0x28000000,
+		/* UART 1 */ {
+			.phys_start = 0x28001000,
+			.virt_start = 0x28001000,
 			.size = 0x1000,
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
 				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
@@ -124,7 +123,7 @@ struct {
 			.address = 0x29a00000,
 			.pin_base = 32,
 			.pin_bitmap = {
-				1 << (38 - 32),
+				1 << (39 - 32) | 1 << (60 - 32) | 1 << (61 - 32) | 1 << (62 - 32) | 1 << (63 - 32), /* uart1=39, pcie_inta=60,pcie_intb=61,pcie_intc=62,pcie_intd=63 */
 				0,
 				0,
 				1 << (102 + 32 - 128),
