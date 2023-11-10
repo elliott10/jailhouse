@@ -18,7 +18,7 @@
 struct {
 	struct jailhouse_cell_desc cell;
 	__u64 cpus[1];
-	struct jailhouse_memory mem_regions[10];
+	struct jailhouse_memory mem_regions[12];
 	struct jailhouse_irqchip irqchips[1];
 	struct jailhouse_pci_device pci_devices[3];
 	struct jailhouse_pci_capability pci_caps[14];
@@ -89,6 +89,23 @@ struct {
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
 				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
 		},
+
+		/* PCI bridge @00:04.0 BAR0 */
+		{
+			.phys_start = 0x1000400000,
+			.virt_start = 0x1000400000,
+			.size = 0x00100000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE,
+		},
+
+		/* e1000e BAR0 */
+		{
+			.phys_start = 0x581c0000,
+			.virt_start = 0x581c0000,
+			.size = 0x00020000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE,
+		},
+
 		/* ETH1 */
 		{
 			.phys_start = 0x28210000,
