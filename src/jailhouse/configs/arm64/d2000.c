@@ -223,14 +223,23 @@ struct {
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
 				JAILHOUSE_MEM_IO,
 		},
-		/* ixic */
+
+		/* IXIC ctr */
 		{
 			.phys_start = 0x29000000,
 			.virt_start = 0x29000000,
-			.size = 0x102000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO,
-		},        
+			.size = 0x60000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+		},
+
+		/* IXIC hpb */
+		{
+			.phys_start = 0x29100000,
+			.virt_start = 0x29100000,
+			.size = 0x2000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+		},
+
 		/* Mailbox */
 		{
 			.phys_start = 0x2a000000,
