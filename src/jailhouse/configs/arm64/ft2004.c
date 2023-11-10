@@ -315,7 +315,7 @@ struct {
 				0xffffc000, 0x00000000, 0x00000000,
 			},
 
-			.caps_start = 5,
+			.caps_start = 8,
 			.num_caps = 6,
 		},
 	},
