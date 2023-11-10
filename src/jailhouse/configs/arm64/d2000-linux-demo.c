@@ -18,7 +18,7 @@
 struct {
 	struct jailhouse_cell_desc cell;
 	__u64 cpus[1];
-	struct jailhouse_memory mem_regions[12];
+	struct jailhouse_memory mem_regions[14];
 	struct jailhouse_irqchip irqchips[1];
 	struct jailhouse_pci_device pci_devices[3];
 	struct jailhouse_pci_capability pci_caps[14];
@@ -106,14 +106,22 @@ struct {
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE,
 		},
 
-		/* ETH1 */
+		/* IXIC ctr */
 		{
-			.phys_start = 0x28210000,
-			.virt_start = 0x28210000,
-			.size = 0x2000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+			.phys_start = 0x29000000,
+			.virt_start = 0x29000000,
+			.size = 0x60000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
 		},
+
+		/* IXIC hpb */
+		{
+			.phys_start = 0x29100000,
+			.virt_start = 0x29100000,
+			.size = 0x2000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+		},
+
 		/* RAM */ {
 			.phys_start = 0xb1100000,
 			.virt_start = 0,
