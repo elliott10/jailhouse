@@ -82,12 +82,13 @@ struct {
 			.size = 0x2000,
 			.flags = JAILHOUSE_MEM_READ  | JAILHOUSE_MEM_ROOTSHARED,
 		},
-		/* UART 1 */ {
+
+		/* UART 1 */
+		{
 			.phys_start = 0x28001000,
 			.virt_start = 0x28001000,
 			.size = 0x1000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
 		},
 
 		/* PCI bridge @00:04.0 BAR0 */
@@ -122,26 +123,27 @@ struct {
 			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO | JAILHOUSE_MEM_ROOTSHARED,
 		},
 
-		/* RAM */ {
-			.phys_start = 0xb1100000,
+		/* RAM: for linux-loader space */
+		{
+			.phys_start = 0x2000000000,
 			.virt_start = 0,
 			.size = 0x800000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_LOADABLE,
 		},
-		/* RAM */ {
-			.phys_start = 0xb2000000,
-			.virt_start = 0xb2000000,
-			.size = 0x1d000000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_DMA |
-				JAILHOUSE_MEM_LOADABLE,
+
+		/* RAM */
+		{
+			.phys_start = 0x2000080000,
+			.virt_start = 0x2000080000,
+			.size = 0x40000000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_EXECUTE | JAILHOUSE_MEM_DMA | JAILHOUSE_MEM_LOADABLE,
 		},
-		/* communication region */ {
+
+		/* Communication Region */
+		{
 			.virt_start = 0x80000000,
 			.size = 0x00001000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE |
-				JAILHOUSE_MEM_COMM_REGION,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_COMM_REGION,
 		},
 	},
 
