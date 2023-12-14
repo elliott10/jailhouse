@@ -67,8 +67,8 @@ struct {
 		{
 			.phys_start = 0x1000300000,
 			.virt_start = 0x1000300000,
-			.size = 0x00010000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE,
+			.size = 0x00100000,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO,
 		},
 
 		/* e1000 BAR0 */
@@ -76,7 +76,7 @@ struct {
 			.phys_start = 0x582c0000,
 			.virt_start = 0x582c0000,
 			.size = 0x00020000,
-			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE,
+			.flags = JAILHOUSE_MEM_READ | JAILHOUSE_MEM_WRITE | JAILHOUSE_MEM_IO,
 		},
 
 		/* RAM: for linux-loader space */
