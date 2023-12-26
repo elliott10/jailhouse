@@ -22,7 +22,7 @@ struct {
 #ifdef CONFIG_PCIE_E1000E_TEST
 	struct jailhouse_pci_device pci_devices[3];
 	struct jailhouse_pci_capability pci_caps[11];
-	union jailhouse_stream_id stream_ids[1];
+	union jailhouse_stream_id stream_ids[2];
 #else
 	struct jailhouse_pci_device pci_devices[1];
 #endif
@@ -794,6 +794,8 @@ struct {
 	},
 
 	.stream_ids = {
+		/* Non-Volatile memory controller @01:00.0 */
+		{0x0100},
 		/* Intel e1000e @02:00.0 */
 		{0x0200},
 	},
