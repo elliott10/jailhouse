@@ -7,21 +7,19 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 # 2 编译
 
-（1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机环境运行的内核版本应保持一致，且当前phytium jailhouse支持的内核版本与phytium开源内核Phytium-Linux-Kernel一致（即linux-kernel 4.19 和 5.10 版本），请选择使用phytium开源内核进行调测。
+（1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机环境运行的内核版本应保持一致，且当前phytium jailhouse支持的内核版本与phytium开源内核Phytium-Linux-Kernel一致（即Linux-kernel 4.19 和 5.10 版本），请选择使用phytium开源内核进行调测。
 
-e2000内核源码获取命令：
+内核源码获取命令：
 
 	$ git clone https://gitee.com/phytium_embedded/phytium-linux-kernel.git
 
-d2000和ft2000的内核源码请联系飞腾嵌入式软件部获取。
+内核源码中D2000和FT-2000/4的设备树文件未开源，如有需要请联系飞腾嵌入式软件部获取。
 
-（2）编译内核源码，例如在e2000上，在内核源码路径下执行make e2000_defconfig，然后执行make编译内核镜像。如果是在x86环境下编译，需要额外配置好aarch64交叉编译环境：
+（2）编译内核源码，例如在E2000上，在内核源码路径下执行make phytium_defconfig，然后执行make编译内核镜像。如果是在x86环境下编译，需要额外配置好aarch64交叉编译环境：
 
 	$ export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-	$ make e2000_defconfig
+	$ make phytium_defconfig
 	$ make
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/make_kernel_img_with_x86.png)
 
 （3）获取phytium-jailhouse源码，进入到目录phytium-jailhouse/src/jailhouse/下指定内核源码路径：
 
@@ -33,7 +31,7 @@ d2000和ft2000的内核源码请联系飞腾嵌入式软件部获取。
 
 （5）Jailhouse中编译python脚本需要提前安装python3、python3-pip和python3-mako软件包。
 
-（6）编译后的cell文件在jailhouse code的configs/arm64目录下，裸机程序在jailhousecode的inmates/demos/arm64目录下。
+（6）编译后的cell文件在jailhouse code的configs/arm64目录下，裸机程序在jailhouse code的inmates/demos/arm64目录下。
 
 
 # 3 安装与卸载
@@ -61,7 +59,7 @@ d2000和ft2000的内核源码请联系飞腾嵌入式软件部获取。
 
 # 4 运行
 
-目前在飞腾FT2000/4、D2000和E2000上运行如下示例，测试内核版本为4.19，根文件系统为Ubuntu 20.04。如有需要，可联系飞腾嵌入式软件部获取。
+目前在飞腾FT-2000/4、D2000和E2000上运行如下示例，本文档中测试所使用的内核版本为4.19。使用5.10内核时，需要在内核启动参数里添加内存限制：mem = 1G，否则Jailhouse将会报错。根文件系统为Ubuntu 20.04，如有需要，可联系飞腾嵌入式软件部获取。
 
 此章节的测试实例中加载jailhouse驱动模块命令已省略，模块的安装与卸载请参考第3章节，且为了节省篇幅，本章节中测试命令若涉及到文件（包括cell文件、bin文件等），应该在命令中加入文件完整绝对路径或相对路径，例如命令
 
@@ -69,11 +67,11 @@ d2000和ft2000的内核源码请联系飞腾嵌入式软件部获取。
 
 实际上应该在命令中指定文件“d2000.cell”的路径，否则会报错找不到相关文件。
 
-另外，我们的配置文件均针对d2000/e2000飞腾demo测试板进行配置并测试，若测试单板不一样，那么对应的配置文件需跟当前测试的单板保持一致。
+另外，我们的配置文件均针对FT-2000/4、D2000/E2000飞腾demo测试板进行配置并测试，若测试单板不一样，那么对应的配置文件需跟当前测试的单板保持一致。
 
 ## 4.1 设备树保留内存节点
 
-Jailhouse需要保留部分内存空间，在设备树中添加如下节点，保留从0xb0000000开始的256M内存，需要注意这部分内存应与root cell配置文件中的基地址保持一致。
+Jailhouse需要保留部分内存空间，在设备树中添加如下节点，保留从0xb0000000开始的256M内存，需要注意这部分内存应与root cell配置文件中的基地址保持一致。以E2000Q为例，需要在E2000Q设备树文件pe2204.dtsi中的根节点下添加如下内容：
 
     reserved-memory {
         #address-cells = <0x00000002>;
@@ -89,8 +87,11 @@ Jailhouse需要保留部分内存空间，在设备树中添加如下节点，�
 
 ## 4.2 裸机程序
 
-### 4.2.1 ft2000测试
-首先加载jailhouse驱动模块，再加载root cell和non-root cell，在FT2000/4板卡上，ft2004.cell为root cell，主要接管整个系统，ft2004-inmate-demo.cell为non-root cell，从root cell中获取一部分系统资源（共享或者独占），分配给后续加载的裸机程序；最后加载并运行的裸机程序，命令序列和运行效果如下图所示。
+裸跑测试适用的平台包括：E2000Q、D2000、以及FT-2000/4，下面在FT-2000/4和D2000上进行演示。
+
+### 4.2.1 FT-2000/4测试
+
+首先加载jailhouse驱动模块，再加载root cell和non-root cell，在FT-2000/4板卡上，ft2004.cell为root cell，主要接管整个系统，ft2004-inmate-demo.cell为non-root cell，从root cell中获取一部分系统资源（共享或者独占），分配给后续加载的裸机程序；最后加载并运行的裸机程序，命令序列和运行效果如下图所示。
 
 	# jailhouse enable ft2004.cell;
 	# jailhouse cell create ft2004-inmate-demo.cell;
@@ -99,10 +100,11 @@ Jailhouse需要保留部分内存空间，在设备树中添加如下节点，�
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/uart.png)
 
-### 4.2.2 d2000测试
+### 4.2.2 D2000测试
 
 #### 4.2.2.1 UART测试
-D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的裸机程序，命令序列和运行效果如下图所示：
+
+D2000和FT-2000/4板卡命令序列一致，首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的裸机程序，命令序列和运行效果如下图所示：
 
 	# jailhouse enable d2000.cell;
 	# jailhouse cell create d2000-inmate-demo.cell;
@@ -112,17 +114,20 @@ D2000和FT2000/4板卡命令序列一致，首先加载jailhouse驱动模块，�
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_uart.png)
 
 #### 4.2.2.2 IVSHMEM测试
+
 首先加载jailhouse驱动模块，然后加载D2000的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的ivshmem测试程序，命令序列和运行效果如下图所示：
 
 	# jailhouse enable d2000.cell;
 	# jailhouse cell create d2000-ivshmem-demo.cell;
 	# jailhouse cell load 1 ivshmem-demo.bin;
 	# jailhouse cell start 1;
+
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000-ivshmem.png)
 
 ## 4.3 RTOS
 
-### 4.3.1 ft2000测试
+### 4.3.1 FT-2000/4测试
+
 RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTOS和VxWorks，运行32位和64位的系统需要使用不同的inmate文件，32位VxWorks运行序列和效果如下图所示：
 
 	# jailhouse enable ft2004.cell;
@@ -141,7 +146,8 @@ RTOS的运行需要根据系统特性来适配，目前已经可以运行FreeRTO
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/freertos64.png)
 
-### 4.3.2 d2000测试
+### 4.3.2 D2000测试
+
 D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位。
 
 32位VxWorks运行序列和效果如下所示：
@@ -172,9 +178,9 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000_FreeRTOS64.png)
 
-### 4.3.3 e2000测试
+### 4.3.3 E2000测试
 
-#### e2000q测试
+#### E2000Q测试
 
 64位FreeRTOS运行序列和效果如下所示：
 
@@ -206,156 +212,202 @@ D2000支持FreeRTOS和VxWorks, FreeRTOS支持64位，VxWorks支持32位和64位�
 
 ## 4.4 Linux
 
-与之前的测试不一样，运行non-root Linux除加载Jailhouse驱动和root cell外，还需要提供内核镜像，设备树和根文件系统（目前为Ramdisk），还需要设定合适的启动参数，其中用于non-root Linux的设备树和cell配置需要保持一致。
+与之前的测试不一样，运行non-root Linux除了加载Jailhouse驱动和root cell外，还需要提供内核镜像，设备树和根文件系统（目前为Ramdisk），还需要设定合适的启动参数，其中用于non-root Linux的设备树和cell配置需要保持一致。
 
-### 4.4.1 ft2000测试
-ft2000上命令序列和运行效果如下图所示。
+### 4.4.1 FT-2000/4测试
+
+FT-2000/4上命令序列和运行效果如下图所示。
 
 	# jailhouse enable ft2004.cell
-	# jailhouse cell linux -i initrd.ext2 -d ft2004.dtb ft2004-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 root=/dev/ram0  ramdisk_size=0x1000000"
+	# jailhouse cell linux -i initrd.ext2 -d inmate-ft2004.dtb ft2004-linux-demo.cell /boot/Image -c "console=ttyAMA1,115200 root=/dev/ram0  ramdisk_size=0x1000000"
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/linux.png)
 
-### 4.4.2 d2000测试
-d2000上命令序列和运行效果如下图所示。
+### 4.4.2 D2000测试
+
+D2000上命令序列和运行效果如下图所示。
 
 	# jailhouse enable d2000.cell
-	# jailhouse cell linux -i initrd.ext2 -d d2000.dtb d2000-linux-demo.cell /boot/Image -c "console=ttyAMA0,115200 earlycon=pl011,0x28000000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
+	# jailhouse cell linux -i initrd.ext2 -d inmate-d2000.dtb d2000-linux-demo.cell /boot/Image -c "console=ttyAMA1,115200 earlycon=pl011,0x28001000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000-linux.png)
 
-### 4.4.3 e2000测试
+### 4.4.3 E2000Q测试
 
 需要注意，本章节的测试中涉及多个模块，测试样例仅为了证明Jailhouse是支持在non-root cell使用这些模块的，测试时根据单板情况谨慎使用。
 
-#### 4.4.3.1 i2c测试
-首先需要自行在non-root cell配置文件中加入i2c：
+#### 4.4.3.1 I2C测试
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_i2c_config.png)
+注意：把I2C隔离到non root cell中后，挂接在这个I2C总线上的设备在宿主机上将无法正常工作，请谨慎使用。
 
-并且加入相关中断：
+（1）首先在non-root cell配置文件中加入I2C的相关配置，在configs/arm64/e2000q-linux-demo.c中加入如下内容：
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_int_config.png)
+![输入图片说明](pic/E2000Q_I2C_config1.png)
 
-e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
+（2）加入相关中断：
 
-	# jailhouse enable e2000q.cell
-	# jailhouse cell linux -i initrd.ext2 -d e2000q.dtb e2000q-linux-demo.cell /boot/Image -c "console=ttyAMA1,115200 earlycon=pl011,0x2800d000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
+![输入图片说明](pic/E2000Q_I2C_config2.png)
 
-然后在non-root cell串口通过i2c-tools测试i2c基本功能，效果如下图所示(需要在non-root cell运行的系统中安装i2c-tools)：
+（3）在设备树中添加I2C节点，在configs/arm64/dts/inmate-e2000q.dts中加入如下内容: 
 
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_i2c.png)
+![输入图片说明](pic/E2000Q_I2C_config3.png)
 
-注意：在e2000q demo板上如此配置测试时，因为demo板上i2c接了rtc，若root cell运行的linux有进程用到rtc，由于i2c相关地址/中断配置给non-root cell，root cell linux访问rtc会报错。此测试样例仅为了证明Jailhouse是支持在non-root cell使用i2c的，在e2000q demo板上测试时需慎用。
+（4）E2000Q上通过下面命令创建non-root cell并在此cell上运行Linux，在phytium-jailhouse/src/jailhouse/下执行：
 
-#### 4.4.3.2 can测试
-首先需要自行在non-root cell配置文件中加入can：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_can_config.png)
-
-并且加入相关中断：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_can_int_config.png)
-
-e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
-
-        # jailhouse enable e2000q.cell
-        # jailhouse cell linux -i initrd.ext2 -d e2000q.dtb e2000q-linux-demo.cell /boot/Image -c "console=ttyAMA1,115200 earlycon=pl011,0x2800d000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
-
-然后在non-root cell串口通过打印看到can驱动能正常加载，且通过命令能看到can配置如下图所示：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_can.png)
-
-#### 4.4.3.3 gpio测试
-首先需要自行在non-root cell配置文件中加入gpio：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_config.png)
-
-并且加入相关中断：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_int_config.png)
-
-e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
-
-        # jailhouse enable e2000q.cell
-        # jailhouse cell linux -i initrd.ext2 -d e2000q.dtb e2000q-linux-demo.cell /boot/Image -c "console=ttyAMA1,115200 earlycon=pl011,0x2800d000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
-
-然后在non-root cell串口通过gpioget/gpioset测试gpio基本功能，效果如下图所示(需要在non-root cell运行的系统中安装gpiod)：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_gpio.png)
-
-#### 4.4.3.4 usb测试
-首先需要自行在non-root cell配置文件中加入usb3.0：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_usb_config.png)
-
-并且加入相关中断：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_usb_int_config.png)
-
-e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
-
-        # jailhouse enable e2000q.cell
-        # jailhouse cell linux -i initrd.ext2 -d e2000q.dtb e2000q-linux-demo.cell /boot/Image -c "console=ttyAMA1,115200 earlycon=pl011,0x2800d000 root=/dev/ram0 ramdisk_size=0x1000000 rw swiotlb=force"
-
-然后在demo板上USB3.0处插入U盘，non-root cell运行的linux会打印识别USB设备信息，并且可以通过命令查看USB设备，效果如下所示：
-
-![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_usb.png)
-
-#### 4.4.3.5 pcie测试
-说明： 针对PCIE设备的测试，我们以Intel e1000e网卡作为实例。在配置文件“e2000q.c”以及“e2000q-linux-demo.c“中用宏进行控制，若需要使用，请自行定义相关宏。
-
-（1）首先要在root cell里加入PCIE的相关配置
-
-在configs/arm64/e2000q.c中加入如下内容：
-
-![输入图片说明](pic/e2000_linux_pcie_rootcell_config_1.png)
-
-![输入图片说明](pic/e2000_linux_pcie_rootcell_config_2.png)
-
-![输入图片说明](pic/e2000_linux_pcie_rootcell_config_3.png)
-
-![输入图片说明](pic/e2000_linux_pcie_rootcell_config_4.png)
-
-![输入图片说明](pic/e2000_linux_pcie_rootcell_config_5.png)
-
-（2）然后需要在non-root cell里加入PCIE的相关配置
-
-在configs/arm64/e2000q-linux-demo.c中加入如下内容：
-
-![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_1.png)
-
-![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_2.png)
-
-![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_3.png)
-
-![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_4.png)
-
-![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_5.png)
-
-（3）添加pcie legacy中断
-
-![输入图片说明](pic/e2000_linux_pcie_non_rootcell_config_6.png)
-
-（4）在phytium-jailhouse/src/jailhouse/下执行：
-
-注意：下面的命令中的路径请根据自己的情况进行调整。
+	注意：下面的命令中的路径请根据自己的情况进行调整。
 
 	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
 	# insmod driver/jailhouse.ko
 	# jailhouse enable configs/arm64/e2000q.cell
 	# ./tools/jailhouse-cell-linux \
 	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
-	# -d configs/arm64/dts/inmate-phytium-e2000q.dtb \
+	# -d configs/arm64/dts/inmate-e2000q.dtb \
 	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
 	# configs/arm64/e2000q-linux-demo.cell \
-	# /root/linux-kernel/arch/arm64/boot/Image \  /* e2000内核代码详见飞腾官方，只在4.19内核版本测试通过 */
+	# /root/linux-kernel/arch/arm64/boot/Image \  
 
-（5）测试结果
+（5）然后在non-root cell串口通过i2c-tools测试I2C基本功能，效果如下图所示(需要在non-root cell运行的系统中安装i2c-tools)：
+
+ ![输入图片说明](pic/E2000Q_I2C_output1.png)
+
+
+#### 4.4.3.2 CAN测试
+
+（1）首先在non-root cell配置文件中加入CAN的相关配置，在configs/arm64/e2000q-linux-demo.c中加入如下内容：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_can_config.png)
+
+（2）加入相关中断：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_can_int_config.png)
+
+（3）在设备树中添加CAN节点，在configs/arm64/dts/inmate-e2000q.dts中加入如下内容:
+
+ ![输入图片说明](pic/E2000Q_CAN_config1.png)
+
+（4）E2000Q上通过下面命令创建non-root cell并在此cell上运行Linux，在phytium-jailhouse/src/jailhouse/下执行：
+
+	注意：下面的命令中的路径请根据自己的情况进行调整。
+
+	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+	# insmod driver/jailhouse.ko
+	# jailhouse enable configs/arm64/e2000q.cell
+	# ./tools/jailhouse-cell-linux \
+	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+	# -d configs/arm64/dts/inmate-e2000q.dtb \
+	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+	# configs/arm64/e2000q-linux-demo.cell \
+	# /root/linux-kernel/arch/arm64/boot/Image \ 
+
+（5）然后在non-root cell串口通过打印看到CAN驱动能正常加载，且通过命令能看到CAN配置如下图所示：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_can.png)
+
+#### 4.4.3.3 GPIO测试
+
+（1）首先在non-root cell配置文件中加入GPIO的相关配置，在configs/arm64/e2000q-linux-demo.c中加入如下内容：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_config.png)
+
+（2）并且加入相关中断：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_gpio_int_config.png)
+
+（3）在configs/arm64/dts/inmate-e2000q.dts中添加GPIO子节点（以GPIO5为例）：
+
+![输入图片说明](pic/E2000Q_GPIO_config3.png)
+
+（4）E2000Q上通过下面命令创建non-root cell并在此cell上运行Linux，在phytium-jailhouse/src/jailhouse/下执行：
+
+	注意：下面的命令中的路径请根据自己的情况进行调整。
+
+	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+	# insmod driver/jailhouse.ko
+	# jailhouse enable configs/arm64/e2000q.cell
+	# ./tools/jailhouse-cell-linux \
+	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+	# -d configs/arm64/dts/inmate-e2000q.dtb \
+	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+	# configs/arm64/e2000q-linux-demo.cell \
+	# /root/linux-kernel/arch/arm64/boot/Image \
+
+（5）然后在non-root cell串口通过gpioget/gpioset测试GPIO基本功能，效果如下图所示(需要在non-root cell运行的系统中安装gpiod)：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_gpio.png)
+
+#### 4.4.3.4 USB测试
+
+（1）首先在non-root cell配置文件中加入USB的相关配置，在configs/arm64/e2000q-linux-demo.c中加入如下内容：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_usb_config.png)
+
+（2）并且加入相关中断：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_add_usb_int_config.png)
+
+（3）在设备树中添加USB节点，在configs/arm64/dts/inmate-e2000q.dts中加入如下内容:
+
+ ![输入图片说明](pic/E2000_USB_config1.png)
+
+（4）E2000Q上通过下面命令创建non-root cell并在此cell上运行Linux，在phytium-jailhouse/src/jailhouse/下执行：
+
+	注意：下面的命令中的路径请根据自己的情况进行调整。
+
+	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+	# insmod driver/jailhouse.ko
+	# jailhouse enable configs/arm64/e2000q.cell
+	# ./tools/jailhouse-cell-linux \
+	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+	# -d configs/arm64/dts/inmate-e2000q.dtb \
+	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+	# configs/arm64/e2000q-linux-demo.cell \
+	# /root/linux-kernel/arch/arm64/boot/Image \
+
+（5）然后在E2000Q demo板上USB3.0处插入U盘，non-root cell运行的Linux会打印识别USB设备信息，并且可以通过命令查看USB设备，效果如下所示：
+
+![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/e2000_linux_usb.png)
+
+#### 4.4.3.5 PCIe测试
+
+说明： 针对PCIe设备的测试，我们以Intel e1000e网卡作为实例。在配置文件“e2000q.c”以及“e2000q-linux-demo.c“中用宏进行控制，若需要使用，请自行定义相关宏。
+
+（1）在宿主机的Linux内核配置中禁用SMMU，如下截图所示：
+
+![输入图片说明](pic/E2000_PCIe_config3.png)
+
+（2）然后在root cell以及non-root cell里定义宏，从而打开PCIe的相关配置
+
+在configs/arm64/e2000q.c中加入如下内容:
+
+![输入图片说明](pic/E2000_PCIe_config1.png)
+
+在configs/arm64/e2000q-linux-demo.c中加入如下内容：
+
+![输入图片说明](pic/E2000_PCIe_config2.png)
+
+（3）在phytium-jailhouse/src/jailhouse/下执行：
+    
+	注意：下面的命令中的路径请根据自己的情况进行调整。
+
+	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+	# insmod driver/jailhouse.ko
+	# jailhouse enable configs/arm64/e2000q.cell
+	# ./tools/jailhouse-cell-linux \
+	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+	# -d configs/arm64/dts/inmate-e2000q.dtb \
+	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+	# configs/arm64/e2000q-linux-demo.cell \
+	# /root/linux-kernel/arch/arm64/boot/Image \  
+
+（4）测试结果
 
 注意：下面的命令均在guest os里运行
 
+给e1000e网卡配置IP，ping其他主机的IP地址：
+
 ![输入图片说明](pic/e2000_linux_pcie_output_1.png)
+
+查看中断信息：
 
 ![输入图片说明](pic/e2000_linux_pcie_output_2.png)
 
@@ -365,59 +417,85 @@ e2000q上通过下面命令创建non-root cell并在此cell上运行linux：
 
 测试通过
 
-#### 4.4.3.6 smmu测试
-（1）前置条件
+#### 4.4.3.6 eMMC测试
+（1）首先在non-root cell配置文件中加入eMMC的相关配置，在configs/arm64/e2000q-linux-demo.c中加入如下内容：
 
-root-cell 和 non-root cell 的配置和PCIE测试中保持一致，要求PCIE测试能通过。
+![输入图片说明](pic/E2000Q_eMMC_config1.png)
 
-需要对宿主机的内核配置进行处理，禁用smmu。
+（2）并且加入相关中断：
 
-![输入图片说明](pic/e2000_linux_smmu_1.png)
+![输入图片说明](pic/E2000Q_eMMC_config2.png)
 
-（2）使能和配置SMMU-V3
+（3）在设备树中添加eMMC节点，在configs/arm64/dts/inmate-e2000q.dts中加入如下内容:
 
-non-root cell 配置文件加入以下内容:
+![输入图片说明](pic/E2000Q_eMMC_config3.png)
 
-![输入图片说明](pic/e2000_linux_smmu_non_root_cell_config_1.png)
+（4）在phytium-jailhouse/src/jailhouse/下执行：
 
-![输入图片说明](pic/e2000_linux_smmu_non_root_cell_config_2.png)
+	注意：下面的命令中的路径请根据自己的情况进行调整。
+	
+	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+	# insmod driver/jailhouse.ko
+	# jailhouse enable configs/arm64/e2000q.cell
+	# ./tools/jailhouse-cell-linux \
+	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+	# -d configs/arm64/dts/inmate-e2000q.dtb \
+	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+	# configs/arm64/e2000q-linux-demo.cell \
+	# /root/linux-kernel/arch/arm64/boot/Image \  
 
-![输入图片说明](pic/e2000_linux_smmu_non_root_cell_config_3.png)
+（5）测试结果
+注意：下面的命令均在guest os里运行
 
-root cell 配置文件加入以下内容:
+![输入图片说明](pic/E2000Q_eMMC_output1.png)
 
-![输入图片说明](pic/e2000_linux_smmu_root_cell_config_1.png)
-
-![输入图片说明](pic/e2000_linux_smmu_root_cell_config_2.png)
-
-（3）测试步骤
-
-smmu-v3使能前提下，pci legacy中断功能测试。
-
-注意：下面的命令中的路径请根据自己的情况进行调整。
-
-      # make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
-      # insmod driver/jailhouse.ko
-      # jailhouse enable configs/arm64/e2000q.cell
-      # ./tools/jailhouse-cell-linux \
-      # -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
-      # -d configs/arm64/dts/inmate-phytium-e2000q.dtb \
-      # -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
-      # configs/arm64/e2000q-linux-demo.cell \
-      # /root/linux-kernel/arch/arm64/boot/Image \  /* e2000内核代码详见飞腾官方，只在4.19内核版本测试通过 */
+测试结果：non-root cell的数据能正常存储到eMMC上
 
 
-（4） 测试结果：
+#### 4.4.3.7 SATA测试
+注意：如果使用已经分给虚拟机的SATA盘作为宿主机的引导盘，会导致宿主机不能正常启动，请谨慎操作。本节测试使用U盘作为宿主机的引导盘，然后将SATA隔离给non root cell。
 
-![输入图片说明](pic/e2000_linux_smmu_output_1.png)
+（1）首先在non-root cell配置文件中加入SATA的相关配置，在configs/arm64/e2000q-linux-demo.c中加入如下内容：
 
-![输入图片说明](pic/e2000_linux_smmu_output_2.png)
+![输入图片说明](pic/E2000Q_SATA_config1.png)
 
-![输入图片说明](pic/e2000_linux_smmu_output_3.png)
+（2）并且加入相关中断：
 
-![输入图片说明](pic/e2000_linux_smmu_output_4.png)
+![输入图片说明](pic/E2000Q_SATA_config2.png)
+
+（3）在设备树中添加SATA节点，在configs/arm64/dts/inmate-e2000q.dts中加入如下内容:
+
+![输入图片说明](pic/E2000Q_SATA_config3.png)
+
+（4）在phytium-jailhouse/src/jailhouse/下执行：
+
+	注意：下面的命令中的路径请根据自己的情况进行调整。
+	
+	# make && rm -rf /lib/firmware/jailhouse.bin && cp hypervisor/jailhouse.bin /lib/firmware/ && sync
+	# insmod driver/jailhouse.ko
+	# jailhouse enable configs/arm64/e2000q.cell
+	# ./tools/jailhouse-cell-linux \
+	# -i ./initrd_new.img \      /* 该image如有需要，请联系飞腾嵌入式软件部 */
+	# -d configs/arm64/dts/inmate-e2000q.dtb \
+	# -c "console=ttyAMA1,115200 earlycon=pl011, 0x2800d000 root=/dev/ram0 rw loglevel=8 pci=nomsi" \
+	# configs/arm64/e2000q-linux-demo.cell \
+	# /root/linux-kernel/arch/arm64/boot/Image \  
+
+（5）测试结果
+注意：下面的命令均在guest os里运行
+
+挂载SATA盘：
+
+![输入图片说明](pic/E2000Q_SATA_output1.png)
+
+数据读写：
+
+![输入图片说明](pic/E2000Q_SATA_output2.png)
+
+测试结果：non-root cell数据能正常存储到SATA上。
 
 # 5 Non-root linux实时性测试
+
 测试使用了stress和while循环脚本（均运行四个进程）来增加系统负载，命令如下：
 
 	$ stress -c 4
@@ -462,3 +540,4 @@ KVM实时内核测试结果：
 
 	huyuming1672@phytium.com.cn
 	yangshaojun@phytium.com.cn
+	wenhuaizhi2026@phytium.com.cn
