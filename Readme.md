@@ -7,7 +7,7 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 # 2 编译
 
-（1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机环境运行的内核版本应保持一致，且当前phytium jailhouse支持的内核版本与phytium开源内核Phytium-Linux-Kernel一致（即Linux-kernel 4.19 和 5.10 版本），请选择使用phytium开源内核进行调测。
+（1）通过gitee或是正式技术支持渠道获取内核源码，需要注意内核版本和目标机器环境运行的内核版本应保持一致，且当前phytium jailhouse支持的内核版本与phytium开源内核Phytium-Linux-Kernel一致（即Linux-kernel 4.19 和 5.10 版本），请选择使用phytium开源内核进行调测。
 
 内核源码获取命令：
 
@@ -15,23 +15,26 @@ Jailhouse编译完成后，生成文件分为三部分：第一部分，Jailhous
 
 内核源码中D2000和FT-2000/4的设备树文件未开源，如有需要请联系飞腾嵌入式软件部获取。
 
-（2）编译内核源码，例如在E2000上，在内核源码路径下执行make phytium_defconfig，然后执行make编译内核镜像。如果是在x86环境下编译，需要额外配置好aarch64交叉编译环境：
+（2）编译内核源码，例如在E2000上，在内核源码路径下执行make phytium_defconfig，然后执行make编译内核镜像。编译内核源码的具体步骤请参考Phytium-Linux-Kernel wiki部分，链接如下：
 
-	$ export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-	$ make phytium_defconfig
-	$ make
+	https://gitee.com/phytium_embedded/phytium-linux-kernel/wikis/%E5%8D%95%E7%8B%AC%E7%BC%96%E8%AF%91Linux%20Kernel
 
-（3）获取phytium-jailhouse源码，进入到目录phytium-jailhouse/src/jailhouse/下指定内核源码路径：
+（3）如果是在x86环境下编译，需要额外配置好aarch64交叉编译环境，详情请参考Phytium-Linux-Kernel wiki部分。
+
+（4）获取phytium-jailhouse源码，进入到目录phytium-jailhouse/src/jailhouse/下指定内核源码路径：
 
 	$ export KDIR=~/linux_419/phytium-linux-kernel
 
 （注：~/linux_419/phytium-linux-kernel 是本地内核源码路径）
 
-（4）编译Jailhouse，在phytium-jailhouse/src/jailhouse/下执行make，同样，如果是在x86环境下编译，需要配置好aarch64交叉编译环境。
+（5）编译并安装Jailhouse，在phytium-jailhouse/src/jailhouse/下执行如下命令。同样，如果是在x86环境下编译，需要配置好aarch64交叉编译环境。
 
-（5）Jailhouse中编译python脚本需要提前安装python3、python3-pip和python3-mako软件包。
+	$ make
+	$ make install
 
-（6）编译后的cell文件在jailhouse code的configs/arm64目录下，裸机程序在jailhouse code的inmates/demos/arm64目录下。
+（6）Jailhouse中编译python脚本需要提前安装python3、python3-pip和python3-mako软件包。
+
+（7）编译后的cell文件在jailhouse code的configs/arm64目录下，裸机程序在jailhouse code的inmates/demos/arm64目录下。
 
 
 # 3 安装与卸载
