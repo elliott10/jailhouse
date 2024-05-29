@@ -67,6 +67,10 @@ static void __attribute__((noreturn)) help(char *prog, int exit_status)
 	       "\nAvailable commands:\n"
 	       "   enable SYSCONFIG\n"
 	       "   disable\n"
+	       "   axvm create CPU_MASK VM_TYPE BIOS_IMG KERNEL_IMG RAMDISK_IMG\n"
+	       "   axvm list 	(not implemented yet)\n"
+	       "   axvm boot ID (not implemented yet)\n"
+	       "   axvm destroy (not implemented yet)\n"
 	       "   console [-f | --follow]\n"
 	       "   cell create CELLCONFIG\n"
 	       "   cell list\n"
@@ -134,6 +138,18 @@ static void *read_string(const char *string, size_t *size)
 		fprintf(stderr, "insufficient memory\n");
 		exit(1);
 	}
+
+	return buffer;
+}
+
+static void *copy_path(const char *name, size_t length) {
+	void *buffer;
+	buffer = malloc(length);
+	if (!buffer) {
+		fprintf(stderr, "insufficient memory\n");
+		exit(1);
+	}
+	memcpy(buffer, name, length);
 
 	return buffer;
 }
@@ -514,6 +530,67 @@ static int cell_management(int argc, char *argv[])
 	return err;
 }
 
+// axvm create CPU_MASK VM_TYPE BIOS_IMG KERNEL_IMG RAMDISK_IMG
+// CPU_MASK:	argv[3]
+// VM_TYPE:		argv[4]
+// BIOS_IMG:	argv[5]
+// KERNEL_IMG:	argv[6]
+// RAMDISK_IMG: argv[7]
+static int axvm_create(int argc, char *argv[])
+{
+	struct jailhouse_axvm_create axvm_cfg;
+	
+	int err, fd;
+	size_t size;
+
+	memset(&axvm_cfg, 0, sizeof(struct jailhouse_axvm_create));
+
+	if (argc < 6) {
+        fprintf(stderr, "Please use the correct format: PATH_TO_JAILHOUSE axtask up CPUMASK TYPE PATH_TO_IMAGE\n");
+        return -1;
+    }
+    axvm_cfg.cpu_mask = atoi(argv[3]);
+	axvm_cfg.type = atoi(argv[4]);
+	printf("axtask cpumask:%lld type:%d \n", axvm_cfg.cpu_mask, axvm_cfg.type);
+	
+	for(int i = 5; i < argc; ++i) {
+		axvm_cfg.name_size[i-5] = strlen(argv[i]);
+		axvm_cfg.name_addr[i-5] = (unsigned long)copy_path(argv[i], axvm_cfg.name_size[i-5]);
+		
+		axvm_cfg.img_addr[i-5] = (unsigned long)read_file(argv[i], &size);
+		axvm_cfg.img_size[i-5] = size;
+		// printf(" addr%d:%llx, size%d: %lld ", i-4, axvm_cfg.addr[i-4], i-4, axvm_cfg.size[i-4]);
+	}
+	
+	fd = open_dev();
+	err = ioctl(fd, JAILHOUSE_AXVM_CREATE, &axvm_cfg);
+	if (err)
+		perror("JAILHOUSE_AXVM_CREATE");
+	close(fd);
+	for(int i = 5; i < argc; ++i) {
+		free((void *)(unsigned long)axvm_cfg.img_addr[i]);
+		free((void *)(unsigned long)axvm_cfg.name_addr[i]);
+	}
+	
+	return err;
+}
+
+static int arceos_management(int argc, char *argv[])
+{
+	int err;
+	printf("arceos_management argc:%d\n", argc);
+	if (argc < 3)
+		help(argv[0], 1);
+
+	if (strcmp(argv[2], "create") == 0) {
+		err = axvm_create(argc, argv);
+	}  else {
+		help(argv[0], 1);
+	}
+
+	return err;
+}
+
 static int console(int argc, char *argv[])
 {
 	bool non_block = true;
@@ -571,6 +648,8 @@ int main(int argc, char *argv[])
 		close(fd);
 	} else if (strcmp(argv[1], "cell") == 0) {
 		err = cell_management(argc, argv);
+ 	} else if (strcmp(argv[1], "axvm") == 0) {
+ 		err = arceos_management(argc, argv);
 	} else if (strcmp(argv[1], "console") == 0) {
 		err = console(argc, argv);
 	} else if (strcmp(argv[1], "config") == 0 ||

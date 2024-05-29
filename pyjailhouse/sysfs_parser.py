@@ -147,19 +147,25 @@ def parse_iomem_tree(tree):
             continue
 
         # blacklisted on all levels, covers both APIC and IOAPIC
-        if s.find('PCI MMCONFIG') >= 0 or s.find('APIC') >= 0:
-            continue
+        # if s.find('PCI MMCONFIG') >= 0 or s.find('APIC') >= 0:
+        #     continue
 
         # if the tree continues recurse further down ...
-        if tree.children:
-            (temp_regions, temp_dmar_regions) = parse_iomem_tree(tree)
-            regions.extend(temp_regions)
-            dmar_regions.extend(temp_dmar_regions)
-            continue
-        else:
-            # blacklisted if it has no children
-            if s.lower() == 'reserved':
-                continue
+        # if tree.children:
+        #     (temp_regions, temp_dmar_regions) = parse_iomem_tree(tree)
+        #     regions.extend(temp_regions)
+        #     dmar_regions.extend(temp_dmar_regions)
+        #     continue
+        # else:
+
+              # We do not blackedlisted these reserved regions.
+              # On the contrary, we map them for Linux for these reasons:
+              # * IOAPIC, HPet or regions reserved for Graphics may hide behind it.
+              # * Linux will operate it for unknown reason.
+
+        #     # blacklisted if it has no children
+        #     if s.lower() == 'reserved':
+        #         continue
 
         # add all remaining leaves
         regions.append(r)
@@ -183,27 +189,31 @@ def parse_iomem(pcidevices):
             continue
 
         append_r = True
-        # filter the list for MSI-X pages
-        for d in pcidevices:
-            if r.start <= d.msix_address <= r.stop:
-                if d.msix_address > r.start:
-                    head_r = MemRegion(r.start, d.msix_address - 1,
-                                       r.typestr, r.comments)
-                    ret.append(head_r)
-                if d.msix_address + d.msix_region_size < r.stop:
-                    tail_r = MemRegion(d.msix_address + d.msix_region_size,
-                                       r.stop, r.typestr, r.comments)
-                    ret.append(tail_r)
-                append_r = False
-                break
+        
+        # # filter the list for MSI-X pages
+        # for d in pcidevices:
+        #     if r.start <= d.msix_address <= r.stop:
+        #         if d.msix_address > r.start:
+        #             head_r = MemRegion(r.start, d.msix_address - 1,
+        #                                r.typestr, r.comments)
+        #             ret.append(head_r)
+        #         if d.msix_address + d.msix_region_size < r.stop:
+        #             tail_r = MemRegion(d.msix_address + d.msix_region_size,
+        #                                r.stop, r.typestr, r.comments)
+        #             ret.append(tail_r)
+        #         append_r = False
+        #         break
+        
         # filter out the ROMs
         if r.start >= rom_region.start and r.stop <= rom_region.stop:
             add_rom_region = True
             append_r = False
         # filter out and save DMAR regions
+        # Todo: we just map 'dmar' for host Linux.
         if r.typestr.find('dmar') >= 0:
             dmar_regions.append(r)
-            append_r = False
+            # append_r = False
+
         # filter out AMD IOMMU regions
         if r.typestr.find('amd_iommu') >= 0:
             append_r = False
@@ -336,6 +346,8 @@ def parse_dmar_devscope(f):
 # parsing of DMAR ACPI Table
 # see Intel VT-d Spec chapter 8
 def parse_dmar(pcidevices, ioapics, dmar_regions):
+    return [], []
+
     f = input_open('/sys/firmware/acpi/tables/DMAR', 'rb')
     signature = f.read(4)
     if signature != b'DMAR':
@@ -451,6 +463,8 @@ def parse_dmar(pcidevices, ioapics, dmar_regions):
 
 
 def parse_ivrs(pcidevices, ioapics):
+    return [], []
+
     def format_bdf(bdf):
         bus, dev, fun = (bdf >> 8) & 0xff, (bdf >> 3) & 0x1f, bdf & 0x7
         return '%02x:%02x.%x' % (bus, dev, fun)
@@ -944,7 +958,12 @@ class MemRegion(IORegion):
                 self.typestr == 'Kernel' or
                 self.typestr == 'RAM buffer' or
                 self.typestr == 'ACPI DMAR RMRR' or
-                self.typestr == 'ACPI IVRS')
+                self.typestr == 'ACPI IVRS' or
+                # Just mark Reserved memory as `JAILHOUSE_MEM_EXECUTE`
+                # Do not know somehow Linux will execute codes on Reserved Memory region,
+                # which will caused an unhandled EPT violation with `executed` flag.
+                self.typestr == 'Reserved'
+                )
 
     def flagstr(self, p=''):
         if self.is_ram():

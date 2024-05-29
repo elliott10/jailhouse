@@ -293,6 +293,7 @@ for i,d in enumerate(pci_devices):
 vtd_interrupt_limit = 2**math.ceil(math.log(int_src_count, 2))
 
 # Determine hypervisor memory
+# inmatemem = 0 # kmg_multiply_str(options.mem_inmates)
 inmatemem = kmg_multiply_str(options.mem_inmates)
 hvmem = [0, kmg_multiply_str(options.mem_hv)]
 total = hvmem[1] + inmatemem
@@ -310,6 +311,12 @@ hvmem[0] = ourmem[0]
 mem_regions.append(sysfs_parser.MemRegion(ourmem[0] + hvmem[1],
                                           ourmem[0] + hvmem[1] + inmatemem - 1,
                                           'JAILHOUSE Inmate Memory'))
+# inmatereg = sysfs_parser.MemRegion(ourmem[0] + hvmem[1],
+#                                           ourmem[0] + hvmem[1] + inmatemem - 1,
+#                                           'JAILHOUSE Inmate Memory')
+
+for r in mem_regions:
+    print(r)
 
 kwargs = {
     'mem_regions': mem_regions,

@@ -46,6 +46,7 @@
 #endif
 
 #include "cell.h"
+#include "axvm.h"
 #include "jailhouse.h"
 #include "main.h"
 #include "pci.h"
@@ -65,15 +66,22 @@
 	FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX
 #endif
 
+#ifndef MSR_IA32_FEAT_CTL
+#define MSR_IA32_FEAT_CTL MSR_IA32_FEATURE_CONTROL
+#endif
+#ifndef FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX
+#define FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX
+#endif
+
 #if JAILHOUSE_CELL_ID_NAMELEN != JAILHOUSE_CELL_NAME_MAXLEN
 # warning JAILHOUSE_CELL_ID_NAMELEN and JAILHOUSE_CELL_NAME_MAXLEN out of sync!
 #endif
 
 #ifdef CONFIG_X86
-#define JAILHOUSE_AMD_FW_NAME	"jailhouse-amd.bin"
-#define JAILHOUSE_INTEL_FW_NAME	"jailhouse-intel.bin"
+#define JAILHOUSE_AMD_FW_NAME	"arceos-amd.bin"
+#define JAILHOUSE_INTEL_FW_NAME	"arceos-intel.bin"
 #else
-#define JAILHOUSE_FW_NAME	"jailhouse.bin"
+#define JAILHOUSE_FW_NAME	"arceos.bin"
 #endif
 
 MODULE_DESCRIPTION("Management driver for Jailhouse partitioning hypervisor");
@@ -247,6 +255,8 @@ static void enter_hypervisor(void *info)
 	entry = header->entry + (unsigned long) hypervisor_mem;
 
 	if (cpu < header->max_cpus)
+        pr_info("cpu: %d entry: %p\n", cpu, entry);
+
 		/* either returns 0 or the same error code across all CPUs */
 		err = entry(cpu);
 	else
@@ -467,9 +477,10 @@ static int jailhouse_cmd_enable(struct jailhouse_system __user *arg)
 	 * redone since the root-cell config might have changed. */
 	jailhouse_firmware_free();
 
+    pr_info("HV mem phs_start :0x%llx virt: :0x%llx size: 0x%llx\n", hv_mem->phys_start, hv_mem->virt_start, hv_mem->size);
 	hypervisor_mem_res = request_mem_region(hv_mem->phys_start,
 						hv_mem->size,
-						"Jailhouse hypervisor");
+						"ArceOS hypervisor");
 	if (!hypervisor_mem_res) {
 		pr_err("jailhouse: request_mem_region failed for hypervisor "
 		       "memory.\n");
@@ -526,6 +537,8 @@ static int jailhouse_cmd_enable(struct jailhouse_system __user *arg)
 	 * region. */
 	config = (struct jailhouse_system *)
 		(hypervisor_mem + hv_core_and_percpu_size);
+    pr_info("config: 0x%p\n", (void*)config);
+
 	if (copy_from_user(config, arg, config_size)) {
 		err = -EFAULT;
 		goto error_unmap;
@@ -585,6 +598,8 @@ static int jailhouse_cmd_enable(struct jailhouse_system __user *arg)
 
 	error_code = 0;
 
+	pr_info("enter arceos!!!\n");
+
 	preempt_disable();
 
 	header->online_cpus = num_online_cpus();
@@ -601,8 +616,11 @@ static int jailhouse_cmd_enable(struct jailhouse_system __user *arg)
 
 	preempt_enable();
 
+	pr_info("out arceos!!!\n");
+
 	if (error_code) {
 		err = error_code;
+		pr_err("jailhouse: error code: %d\n", err);
 		goto error_free_cell;
 	}
 
@@ -733,8 +751,10 @@ static int jailhouse_cmd_disable(void)
 	preempt_enable();
 
 	err = error_code;
-	if (err)
+	if (err) {
+        pr_err("jailhouse: Failed to disable hypervisor: %d\n", err);
 		goto unlock_out;
+	}
 
 	update_last_console();
 
@@ -776,6 +796,10 @@ static long jailhouse_ioctl(struct file *file, unsigned int ioctl,
 		break;
 	case JAILHOUSE_CELL_DESTROY:
 		err = jailhouse_cmd_cell_destroy((const char __user *)arg);
+		break;
+	case JAILHOUSE_AXVM_CREATE:
+		err = arceos_cmd_axvm_create(
+			(struct jailhouse_axvm_create __user *)arg);
 		break;
 	default:
 		err = -EINVAL;

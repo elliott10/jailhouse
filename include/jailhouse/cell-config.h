@@ -82,7 +82,8 @@
 #define CELL_FLAGS_VIRTUAL_CONSOLE_PERMITTED(flags) \
 	!!((flags) & JAILHOUSE_CELL_VIRTUAL_CONSOLE_PERMITTED)
 
-#define JAILHOUSE_CELL_DESC_SIGNATURE	"JHCLL"
+// #define JAILHOUSE_CELL_DESC_SIGNATURE	"JHCLL"
+#define JAILHOUSE_CELL_DESC_SIGNATURE	"AOSCEL"
 
 /**
  * The jailhouse cell configuration.
@@ -315,7 +316,8 @@ struct jailhouse_pio {
 		.length = __length,	\
 	}
 
-#define JAILHOUSE_SYSTEM_SIGNATURE	"JHSYS"
+// #define JAILHOUSE_SYSTEM_SIGNATURE	"JHSYS"
+#define JAILHOUSE_SYSTEM_SIGNATURE	"ACESYS"
 
 /*
  * The flag JAILHOUSE_SYS_VIRTUAL_DEBUG_CONSOLE allows the root cell to read

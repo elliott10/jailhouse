@@ -16,6 +16,7 @@
 #include <linux/mutex.h>
 
 #include "cell.h"
+#include "axvm.h"
 
 #ifdef CONFIG_X86
 #define JAILHOUSE_ARCHITECTURE	JAILHOUSE_X86

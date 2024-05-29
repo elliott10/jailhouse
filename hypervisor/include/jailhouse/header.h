@@ -12,7 +12,8 @@
 
 #include <asm/jailhouse_header.h>
 
-#define JAILHOUSE_SIGNATURE	"JAILHOUS"
+// #define JAILHOUSE_SIGNATURE	"JAILHOUS"
+#define JAILHOUSE_SIGNATURE	"AOSIMAGE"
 
 #define HYP_STUB_ABI_LEGACY 0
 #define HYP_STUB_ABI_OPCODE 1
