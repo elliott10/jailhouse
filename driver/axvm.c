@@ -14,6 +14,12 @@
 
 #include <jailhouse/hypercall.h>
 
+#include <linux/version.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,7,0)
+#define add_cpu(cpu)		cpu_up(cpu)
+#define remove_cpu(cpu)		cpu_down(cpu)
+#endif
+
 static cpumask_t offlined_cpus;
 
 
@@ -104,7 +110,7 @@ int arceos_cmd_axvm_create(struct jailhouse_axvm_create __user *arg)
     for (cpu = 0; cpu < sizeof(cpu_mask) * 8; cpu++) {
         if (cpu_mask & (1 << cpu)) {
             if (cpu_online(cpu)) {
-				err = cpu_down(cpu);
+				err = remove_cpu(cpu);
 				pr_err("cpu %d is down err:%d\n", cpu, err);
 				if (err)
 					goto error_cpu_online;
@@ -218,7 +224,7 @@ error_cpu_online:
 	pr_err("create axvm failed err:%d\n", err);
 	for (cpu = 0; cpu < sizeof(cpu_mask) * 8; cpu++) {
         if (cpu_mask & (1 << cpu))  {
-			if (!cpu_online(cpu) && cpu_up(cpu) == 0)
+			if (!cpu_online(cpu) && add_cpu(cpu) == 0)
 				cpumask_clear_cpu(cpu, &offlined_cpus);
 			cpumask_set_cpu(cpu, &root_cell->cpus_assigned);
 		}

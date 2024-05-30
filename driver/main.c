@@ -254,13 +254,14 @@ static void enter_hypervisor(void *info)
 
 	entry = header->entry + (unsigned long) hypervisor_mem;
 
-	if (cpu < header->max_cpus)
-        pr_info("cpu: %d entry: %p\n", cpu, entry);
+	if (cpu < header->max_cpus) {
+		pr_info("cpu: %d entry: %p\n", cpu, entry);
 
 		/* either returns 0 or the same error code across all CPUs */
 		err = entry(cpu);
-	else
+	} else {
 		err = -EINVAL;
+	}
 
 	if (err)
 		error_code = err;
