@@ -226,6 +226,9 @@ void *jailhouse_ioremap(phys_addr_t phys, unsigned long virt,
 	else
 		vma = __get_vm_area(size, VM_IOREMAP, VMALLOC_START,
 				    VMALLOC_END);
+
+	pr_info("jailhouse_ioremap: phys=%#llx, virt=%#lx, size=%ld\n", phys, virt, size);
+
 	if (!vma)
 		return NULL;
 	vma->phys_addr = phys;

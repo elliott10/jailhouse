@@ -10,6 +10,6 @@
  * the COPYING file in the top-level directory.
  */
 
-// #define JAILHOUSE_BASE			__JH_CONST_UL(0xffffff0000000000)
-#define JAILHOUSE_BASE			__JH_CONST_UL(0xfffffffff0000000)
+#define JAILHOUSE_BASE			__JH_CONST_UL(0xffffff0000000000)
+// #define JAILHOUSE_BASE			__JH_CONST_UL(0xfffffffff0000000)
 #define JAILHOUSE_BORROW_ROOT_PT	1
