@@ -293,10 +293,12 @@ for i,d in enumerate(pci_devices):
 vtd_interrupt_limit = 2**math.ceil(math.log(int_src_count, 2))
 
 # Determine hypervisor memory
-# inmatemem = 0 # kmg_multiply_str(options.mem_inmates)
-inmatemem = kmg_multiply_str(options.mem_inmates)
+inmatemem = 0 # kmg_multiply_str(options.mem_inmates)
+# inmatemem = kmg_multiply_str(options.mem_inmates)
 hvmem = [0, kmg_multiply_str(options.mem_hv)]
 total = hvmem[1] + inmatemem
+
+## options.mem_inmates=76M, options.mem_hv=4G
 
 ourmem = parse_kernel_cmdline()
 if ourmem is None:

@@ -10,7 +10,7 @@ echo "Created config file at './configs/x86/qemu-arceos.c'"
 
 # Update grub config
 # cmdline=$(echo $cmdline | sed 's/\\/\\\\/g')
-cmdline='memmap=0x100000000\\\\\\$0x100000000  console=ttyS1,115200n8 console=tty1'
+cmdline='memmap=0x100000000\\\$0x100000000 console=ttyS1,115200n8 console=tty1'
 sudo sed -i "s/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"$cmdline\"/" /etc/default/grub
 echo "Appended kernel cmdline: $cmdline, see '/etc/default/grub'"
 
