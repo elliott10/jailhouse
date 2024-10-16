@@ -58,9 +58,15 @@ void arm_cpu_reset(unsigned long pc, bool aarch32)
 	arm_write_sysreg(TTBR1_EL1, 0);
 	arm_write_sysreg(VBAR_EL1, 0);
 
-	arm_read_sysreg(FPEXC32_EL2, fpexc32_el2);
-	fpexc32_el2 |= FPEXC_EL2_EN_BIT;
-	arm_write_sysreg(FPEXC32_EL2, fpexc32_el2);
+	/*
+	 * FPEXC32_EL2 will be enabled only if the system supports FPSIMD and execution
+	 * is in 32-bit Execution state, so here skip restoring fpexc32 for AArch64 guest.
+	 */
+	if (aarch32) {
+		arm_read_sysreg(FPEXC32_EL2, fpexc32_el2);
+		fpexc32_el2 |= FPEXC_EL2_EN_BIT;
+		arm_write_sysreg(FPEXC32_EL2, fpexc32_el2);
+	}
 
 	/* wipe timer registers */
 	arm_write_sysreg(CNTP_CTL_EL0, 0);
