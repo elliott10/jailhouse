@@ -127,6 +127,18 @@ D2000和FT-2000/4板卡命令序列一致，首先加载jailhouse驱动模块，
 
 ![](https://gitee.com/phytium_embedded/phytium-jailhouse/raw/master/pic/d2000-ivshmem.png)
 
+### 4.2.3 E2000Q测试
+
+#### 4.2.3.1 IVSHMEM测试
+
+首先加载jailhouse驱动模块，然后加载E2000Q的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的ivshmem测试程序，命令序列和运行效果如下图所示：
+
+	# jailhouse enable e2000q.cell;
+	# jailhouse cell create e2000q-ivshmem-demo.cell;
+	# jailhouse cell load 1 ivshmem-demo.bin;
+	# jailhouse cell start 1;
+![输入图片说明](pic/e2000q_ivshmem.png)
+
 ## 4.3 RTOS
 
 ### 4.3.1 FT-2000/4测试
