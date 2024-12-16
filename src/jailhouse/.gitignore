@@ -16,6 +16,7 @@
 Module.symvers
 modules.order
 driver/jailhouse.ko
+driver/uio_ivshmem.ko
 include/jailhouse/config.h
 hypervisor/hypervisor.lds
 inmates/lib/arm/inmate.lds
