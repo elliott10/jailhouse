@@ -42,10 +42,18 @@ struct {
 			.flags	 = JAILHOUSE_CON_ACCESS_MMIO | JAILHOUSE_CON_REGDIST_4,
 		},
 		.platform_info = {
+#ifdef CONFIG_IVSHMEM_TEST
+			.pci_mmconfig_base = 0x34000000,
+			.pci_mmconfig_end_bus = 0x0,
+			.pci_is_virtual = 1,
+			.pci_domain = 0xffff,
+#else
 			.pci_mmconfig_base = 0x40000000,
 			.pci_mmconfig_end_bus = 0xff,
 			.pci_is_virtual = 0,
 			.pci_domain = 0,
+#endif
+
 #ifdef CONFIG_PCIE_E1000E_TEST
 			.iommu_units= {
 				{
@@ -684,7 +692,7 @@ struct {
 			.bar_mask = JAILHOUSE_IVSHMEM_BAR_MASK_INTX,
 			.shmem_regions_start = 0,
 			.shmem_dev_id = 0,
-			.shmem_peers = 1,
+			.shmem_peers = 3,
 			.shmem_protocol = JAILHOUSE_SHMEM_PROTO_UNDEFINED,
 		},
 #ifdef CONFIG_PCIE_E1000E_TEST

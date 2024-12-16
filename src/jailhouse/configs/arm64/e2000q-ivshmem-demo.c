@@ -33,6 +33,8 @@ struct {
 		.num_irqchips = ARRAY_SIZE(config.irqchips),
 		.num_pci_devices = ARRAY_SIZE(config.pci_devices),
 
+		.vpci_irq_base = 71-32,
+
 		.console = {
 			.address = 0x2800d000,
 			.type    = JAILHOUSE_CON_TYPE_PL011,
@@ -104,7 +106,10 @@ struct {
 			.address = 0x30800000,
 			.pin_base = 32,
 			.pin_bitmap = {
-				0x1 << (36 - 32) /* SPI 36 pcie_inta */
+				0,
+				0x1 << (71 - 64),
+				0,
+				0
 			},
 		},
 	},
