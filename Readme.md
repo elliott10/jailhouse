@@ -130,14 +130,29 @@ D2000和FT-2000/4板卡命令序列一致，首先加载jailhouse驱动模块，
 ### 4.2.3 E2000Q测试
 
 #### 4.2.3.1 IVSHMEM测试
+首先在root cell 配置文件e2000q.c中定义CONFIG_IVSHMEM_TEST宏，打开ivshmem测试相关的配置，然后重新编译jailhouse：
 
-首先加载jailhouse驱动模块，然后加载E2000Q的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的ivshmem测试程序，命令序列和运行效果如下图所示：
+![输入图片说明](pic/E2000Q_IVSHMEM_1.png)
 
+然后加载jailhouse驱动模块和uio_ivshmem驱动模块（在driver目录下）、加载E2000Q的root cell和non-root cell，non-root cell从root cell分配一部分系统资源，给到后续加载的ivshmem裸机测试程序，命令序列和运行效果如下图所示：
+
+	# insmod jailhouse.ko;
+	# insmod uio_ivshmem.ko;
 	# jailhouse enable e2000q.cell;
 	# jailhouse cell create e2000q-ivshmem-demo.cell;
 	# jailhouse cell load 1 ivshmem-demo.bin;
 	# jailhouse cell start 1;
-![输入图片说明](pic/e2000q_ivshmem.png)
+![输入图片说明](pic/E2000Q_IVSHMEM_2.png)
+
+然后在root cell Linux 中启动 ivshmem 测试程序（在tools/demos目录下），命令序列和运行效果如下：
+
+	# ./tools/demos/ivshmem-demo -d /dev/uio0 -t 1;
+
+![输入图片说明](pic/E2000Q_IVSHMEM_3.png)	
+
+此时non root cell 的串口输出为：
+
+![输入图片说明](pic/E2000Q_IVSHMEM_4.png)
 
 ## 4.3 RTOS
 
