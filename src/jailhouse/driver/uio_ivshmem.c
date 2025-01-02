@@ -26,6 +26,8 @@
 #define IVSHM_CFG_OUTPUT_SECTION_SZ     0x10
 #define IVSHM_CFG_ADDRESS               0x18
 
+#define PCI_DEVICE_ID_IVSHMEM          0x4106
+
 struct ivshm_regs {
          u32 id;
          u32 max_peers;
