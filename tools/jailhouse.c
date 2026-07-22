@@ -539,27 +539,35 @@ static int cell_management(int argc, char *argv[])
 static int axvm_create(int argc, char *argv[])
 {
 	struct jailhouse_axvm_create axvm_cfg;
-	
 	int err, fd;
 	size_t size;
+	int num_images;
 
 	memset(&axvm_cfg, 0, sizeof(struct jailhouse_axvm_create));
 
 	if (argc < 6) {
-        fprintf(stderr, "Please use the correct format: PATH_TO_JAILHOUSE axtask up CPUMASK TYPE PATH_TO_IMAGE\n");
-        return -1;
-    }
-    axvm_cfg.cpu_mask = atoi(argv[3]);
+		fprintf(stderr, "Please use the correct format: jailhouse axvm create CPUMASK TYPE IMAGE1 [IMAGE2 ...]\n");
+		return -1;
+	}
+
+	num_images = argc - 5;
+	if (num_images > JAILHOUSE_FILE_MAXNUM) {
+		fprintf(stderr, "Too many image files specified (maximum is %d)\n", JAILHOUSE_FILE_MAXNUM);
+		return -1;
+	}
+
+	axvm_cfg.cpu_mask = strtoull(argv[3], NULL, 0);
 	axvm_cfg.type = atoi(argv[4]);
-	printf("axtask cpumask:%lld type:%d \n", axvm_cfg.cpu_mask, axvm_cfg.type);
+	printf("axvm cpumask:0x%llx type:%d num_images:%d\n",
+	       (unsigned long long)axvm_cfg.cpu_mask, axvm_cfg.type, num_images);
 	
-	for(int i = 5; i < argc; ++i) {
-		axvm_cfg.name_size[i-5] = strlen(argv[i]);
-		axvm_cfg.name_addr[i-5] = (unsigned long)copy_path(argv[i], axvm_cfg.name_size[i-5]);
+	for (int i = 5; i < argc; ++i) {
+		int idx = i - 5;
+		axvm_cfg.name_size[idx] = strlen(argv[i]);
+		axvm_cfg.name_addr[idx] = (unsigned long)copy_path(argv[i], axvm_cfg.name_size[idx]);
 		
-		axvm_cfg.img_addr[i-5] = (unsigned long)read_file(argv[i], &size);
-		axvm_cfg.img_size[i-5] = size;
-		// printf(" addr%d:%llx, size%d: %lld ", i-4, axvm_cfg.addr[i-4], i-4, axvm_cfg.size[i-4]);
+		axvm_cfg.img_addr[idx] = (unsigned long)read_file(argv[i], &size);
+		axvm_cfg.img_size[idx] = size;
 	}
 	
 	fd = open_dev();
@@ -567,9 +575,11 @@ static int axvm_create(int argc, char *argv[])
 	if (err)
 		perror("JAILHOUSE_AXVM_CREATE");
 	close(fd);
-	for(int i = 5; i < argc; ++i) {
-		free((void *)(unsigned long)axvm_cfg.img_addr[i]);
-		free((void *)(unsigned long)axvm_cfg.name_addr[i]);
+
+	for (int i = 5; i < argc; ++i) {
+		int idx = i - 5;
+		free((void *)(unsigned long)axvm_cfg.img_addr[idx]);
+		free((void *)(unsigned long)axvm_cfg.name_addr[idx]);
 	}
 	
 	return err;

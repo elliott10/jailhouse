@@ -11,6 +11,8 @@
 # the COPYING file in the top-level directory.
 #
 
+set -x
+
 BASEDIR=`cd \`dirname $0\`; pwd`
 
 if test -z $KERNEL; then
@@ -25,7 +27,7 @@ fi
 
 prepare_out()
 {
-	rm -rf $OUTDIR
+	#rm -rf $OUTDIR
 	mkdir -p $OUTDIR
 	cd $OUTDIR
 }
@@ -235,7 +237,7 @@ build_kernel()
 	make O=build-$1 olddefconfig $PARALLEL_BUILD ARCH=$2 CROSS_COMPILE=$3
 	make O=build-$1 $PARALLEL_BUILD ARCH=$2 CROSS_COMPILE=$3
 	# clean up some unneeded build output
-	find build-$1 \( -name "*.o" -o -name "*.cmd" -o -name ".tmp_*" \) -exec rm -rf {} \;
+	#find build-$1 \( -name "*.o" -o -name "*.cmd" -o -name ".tmp_*" \) -exec rm -rf {} \;
 }
 
 package_out()

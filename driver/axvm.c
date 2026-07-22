@@ -89,27 +89,32 @@ int arceos_cmd_axvm_create(struct jailhouse_axvm_create __user *arg)
 {
 	unsigned int cpu;
 	struct jailhouse_axvm_create vm_cfg;
-    int cpu_mask; 
+	unsigned long cpu_mask;
 	int err = 0;
 	unsigned int cpu_id;
 	int vm_id = 0;
 
 	unsigned long arg_phys_addr;
-	struct arceos_axvm_create_arg* arceos_hvc_axvm_create;
+	struct arceos_axvm_create_arg *arceos_hvc_axvm_create = NULL;
 	struct jailhouse_preload_image bios_image;
 	struct jailhouse_preload_image kernel_image;
 	struct jailhouse_preload_image ramdisk_image;
 
 	if (copy_from_user(&vm_cfg, arg, sizeof(vm_cfg)))
 		return -EFAULT;
-	cpu_mask = vm_cfg.cpu_mask;
+
+	cpu_mask = (unsigned long)vm_cfg.cpu_mask;
 	cpu_id = smp_processor_id();
+
+	arceos_hvc_axvm_create = kmalloc(sizeof(struct arceos_axvm_create_arg), GFP_KERNEL);
+	if (!arceos_hvc_axvm_create)
+		return -ENOMEM;
 	
 	/* Off-line each CPU assigned to the axvm and remove it from the
 	 * root cell's set. */
-    for (cpu = 0; cpu < sizeof(cpu_mask) * 8; cpu++) {
-        if (cpu_mask & (1 << cpu)) {
-            if (cpu_online(cpu)) {
+	for (cpu = 0; cpu < sizeof(cpu_mask) * 8; cpu++) {
+		if (cpu_mask & (1 << cpu)) {
+			if (cpu_online(cpu)) {
 				err = remove_cpu(cpu);
 				pr_err("cpu %d is down err:%d\n", cpu, err);
 				if (err)
@@ -117,10 +122,8 @@ int arceos_cmd_axvm_create(struct jailhouse_axvm_create __user *arg)
 				cpumask_set_cpu(cpu, &offlined_cpus);
 			}
 			cpumask_clear_cpu(cpu, &root_cell->cpus_assigned);
-        }
-    }
-
-	arceos_hvc_axvm_create = kmalloc(sizeof(struct arceos_axvm_create_arg), GFP_USER | __GFP_NOWARN);
+		}
+	}
 
 	arceos_hvc_axvm_create->vm_id = 0;
 	arceos_hvc_axvm_create->vm_type = vm_cfg.type;
@@ -144,9 +147,9 @@ int arceos_cmd_axvm_create(struct jailhouse_axvm_create __user *arg)
 
 	arg_phys_addr = __pa(arceos_hvc_axvm_create);
 
-	pr_info("[%s] current cpu:%d cpu_mask:%d\n", __func__, cpu_id, cpu_mask);
+	pr_info("[%s] current cpu:%d cpu_mask:0x%lx\n", __func__, cpu_id, cpu_mask);
 
-    err = jailhouse_call_arg1(ARCEOS_HC_AXVM_CREATE_CFG, arg_phys_addr);
+	err = jailhouse_call_arg1(ARCEOS_HC_AXVM_CREATE_CFG, arg_phys_addr);
 	if (err < 0) {
 		pr_err("[%s] Failed in JAILHOUSE_AXVM_CREATE\n", __func__);
 		goto error_cpu_online;
@@ -223,12 +226,13 @@ int arceos_cmd_axvm_create(struct jailhouse_axvm_create __user *arg)
 error_cpu_online:
 	pr_err("create axvm failed err:%d\n", err);
 	for (cpu = 0; cpu < sizeof(cpu_mask) * 8; cpu++) {
-        if (cpu_mask & (1 << cpu))  {
+		if (cpu_mask & (1 << cpu)) {
 			if (!cpu_online(cpu) && add_cpu(cpu) == 0)
 				cpumask_clear_cpu(cpu, &offlined_cpus);
 			cpumask_set_cpu(cpu, &root_cell->cpus_assigned);
 		}
 	}
-	kfree(arceos_hvc_axvm_create);
+	if (arceos_hvc_axvm_create)
+		kfree(arceos_hvc_axvm_create);
 	return err;
 }

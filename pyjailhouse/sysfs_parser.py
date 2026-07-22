@@ -185,8 +185,8 @@ def parse_iomem(pcidevices):
         # Filter PCI buses in order to avoid mapping empty ones that might
         # require interception when becoming non-empty.
         # Exception: VGA region
-        if r.typestr.startswith('PCI Bus') and r.start != 0xa0000:
-            continue
+        # if r.typestr.startswith('PCI Bus') and r.start != 0xa0000:
+        #     continue
 
         append_r = True
         
@@ -220,7 +220,7 @@ def parse_iomem(pcidevices):
         # merge adjacent RAM regions
         if append_r and len(ret) > 0:
             prev = ret[-1]
-            if prev.is_ram() and r.is_ram() and prev.stop + 1 == r.start:
+            if prev.is_ram() and r.is_ram() and prev.typestr == r.typestr and prev.stop + 1 == r.start:
                 prev.stop = r.stop
                 append_r = False
         if append_r:
@@ -347,8 +347,10 @@ def parse_dmar_devscope(f):
 # see Intel VT-d Spec chapter 8
 def parse_dmar(pcidevices, ioapics, dmar_regions):
     return [], []
-
-    f = input_open('/sys/firmware/acpi/tables/DMAR', 'rb')
+    try:
+        f = input_open('/sys/firmware/acpi/tables/DMAR', 'rb')
+    except IOError:
+        return [], []
     signature = f.read(4)
     if signature != b'DMAR':
         raise RuntimeError('DMAR: incorrect input file format %s' % signature)
@@ -464,12 +466,14 @@ def parse_dmar(pcidevices, ioapics, dmar_regions):
 
 def parse_ivrs(pcidevices, ioapics):
     return [], []
-
     def format_bdf(bdf):
         bus, dev, fun = (bdf >> 8) & 0xff, (bdf >> 3) & 0x1f, bdf & 0x7
         return '%02x:%02x.%x' % (bus, dev, fun)
 
-    f = input_open('/sys/firmware/acpi/tables/IVRS', 'rb')
+    try:
+        f = input_open('/sys/firmware/acpi/tables/IVRS', 'rb')
+    except IOError:
+        return [], []
     signature = f.read(4)
     if signature != b'IVRS':
         raise RuntimeError('IVRS: incorrect input file format %s' % signature)

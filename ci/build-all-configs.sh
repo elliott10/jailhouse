@@ -11,7 +11,7 @@
 # the COPYING file in the top-level directory.
 #
 
-set -e
+set -xe
 
 CONFIGS="x86 banana-pi amd-seattle"
 
